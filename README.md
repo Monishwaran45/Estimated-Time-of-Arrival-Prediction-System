@@ -1,4 +1,4 @@
-# ⏱️ Estimated Time of Arrival (ETA) Prediction System
+# Estimated Time of Arrival (ETA) Prediction System
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-Regressor-orange.svg?logo=xgboost&logoColor=white)](https://xgboost.readthedocs.io/)
@@ -11,7 +11,7 @@ A high-performance Machine Learning solution designed to predict food delivery *
 
 ---
 
-## 📌 Table of Contents
+## Table of Contents
 - [Key Features](#-key-features)
 - [System Architecture](#-system-architecture)
 - [Dataset & Feature Dictionary](#-dataset--feature-dictionary)
@@ -26,7 +26,7 @@ A high-performance Machine Learning solution designed to predict food delivery *
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 - **End-to-End Pipeline**: Encapsulates automated missing value imputation, categorical one-hot encoding, and regression modeling within a single Scikit-Learn `Pipeline`.
 - **High Predictive Power**: Utilizes gradient boosted decision trees (`XGBRegressor`) tuned with `n_estimators=300`, `learning_rate=0.05`, and `max_depth=6`.
@@ -36,7 +36,7 @@ A high-performance Machine Learning solution designed to predict food delivery *
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```mermaid
 flowchart TD
@@ -62,7 +62,7 @@ flowchart TD
 
 ---
 
-## 📊 Dataset & Feature Dictionary
+##  Dataset & Feature Dictionary
 
 The model is trained on `Food_Delivery_Times.csv`, which tracks delivery orders across varied environmental and operational constraints:
 
@@ -79,7 +79,7 @@ The model is trained on `Food_Delivery_Times.csv`, which tracks delivery orders 
 
 ---
 
-## 🔍 Exploratory Data Analysis (EDA)
+## Exploratory Data Analysis (EDA)
 
 Key insights uncovered during exploratory data analysis:
 1. **Distance Impact**: Direct linear and non-linear correlation with delivery duration; trips exceeding 15 km show compounding delays under adverse conditions.
@@ -88,7 +88,7 @@ Key insights uncovered during exploratory data analysis:
 
 ---
 
-## ⚙️ Model Pipeline & Engineering
+##  Model Pipeline & Engineering
 
 ### 1. Data Transformation
 - **Numerical Features** (`Distance_km`, `Preparation_Time_min`, `Courier_Experience_yrs`):
@@ -123,7 +123,7 @@ The model was evaluated on an unseen 20% test split:
 
 ---
 
-## 📁 Project Directory Structure
+##  Project Directory Structure
 
 ```text
 Estimated-Time-of-Arrival-Prediction-System/
@@ -138,7 +138,7 @@ Estimated-Time-of-Arrival-Prediction-System/
 
 ---
 
-## 🚀 Installation & Quickstart
+##  Installation & Quickstart
 
 ### Prerequisites
 - Python 3.9 or higher
@@ -168,7 +168,7 @@ pip install -r requirements.txt
 
 ---
 
-## 💻 Model Inference (Usage Example)
+##  Model Inference (Usage Example)
 
 You can generate instant ETA predictions on new orders using the pre-trained pipeline:
 
@@ -202,7 +202,7 @@ print(f"⏱️ Estimated Delivery Time: {predicted_eta[0]:.2f} minutes")
 
 ---
 
-## 📦 Model Artifacts
+##  Model Artifacts
 
 | File Name | Format | Use Case |
 | :--- | :--- | :--- |
