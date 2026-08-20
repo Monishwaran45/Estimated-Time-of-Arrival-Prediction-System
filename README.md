@@ -59,8 +59,21 @@ Evaluation metrics on test split and cross-validation:
 
 > **Model Selection Rationale**: The **Tuned XGBoost Regressor** (`ETA.joblib` / `xgb_model.json`) was selected as the final production model due to its optimal R² score (0.778), low Mean Absolute Error (~7.28 minutes), rapid inference speed (<5ms per request), native missing feature handling, and cross-platform native JSON artifact export.
 
-## 7. Explainability (SHAP & Feature Analysis)
-Global and local model interpretability insights derived using SHAP (SHapley Additive exPlanations) and XGBoost feature importance:
+### Evaluation Visualizations
+| Model Comparison | Confusion Matrix | ROC Curve |
+| :---: | :---: | :---: |
+| ![Model Comparison](reports/figures/model_comparison.png) | ![Confusion Matrix](reports/figures/confusion_matrix.png) | ![ROC Curve](reports/figures/roc_curve.png) |
+
+## 7. Explainability (SHAP Analysis)
+Global and local model interpretability plots generated for the Tuned model using SHAP (SHapley Additive exPlanations):
+
+### Global Feature Importance & Feature Impact
+| SHAP Bar Plot | SHAP Beeswarm Plot |
+| :---: | :---: |
+| ![SHAP Bar Plot](reports/figures/shap_bar.png) | ![SHAP Beeswarm Plot](reports/figures/shap_beeswarm.png) |
+
+### Local Waterfall Explanation
+![SHAP Waterfall Plot](reports/figures/shap_waterfall.png)
 
 **Top 5 Discriminative Features**:
 1. `Distance_km`: Primary linear driver of transit duration; long distances (>15 km) compound delays under adverse weather.
