@@ -7,9 +7,10 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, m
 
 sys.stdout.reconfigure(encoding='utf-8')
 
+# 1. Load pipeline and real dataset
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_PATH = os.path.join(BASE_DIR, "ETA.joblib")
-DATA_PATH = os.path.join(BASE_DIR, "Food_Delivery_Times.csv")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "ETA.joblib") if os.path.exists(os.path.join(BASE_DIR, "models", "ETA.joblib")) else os.path.join(BASE_DIR, "ETA.joblib")
+DATA_PATH = os.path.join(BASE_DIR, "data", "Food_Delivery_Times.csv") if os.path.exists(os.path.join(BASE_DIR, "data", "Food_Delivery_Times.csv")) else os.path.join(BASE_DIR, "Food_Delivery_Times.csv")
 
 pipeline = joblib.load(MODEL_PATH)
 df = pd.read_csv(DATA_PATH)

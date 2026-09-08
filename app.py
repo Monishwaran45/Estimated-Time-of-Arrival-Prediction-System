@@ -20,17 +20,25 @@ logging.basicConfig(level=logging.INFO)
 
 # Base Directories
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "ETA.joblib")
-DATASET_PATH = os.path.join(BASE_DIR, "Food_Delivery_Times.csv")
+MODELS_DIR = os.path.join(BASE_DIR, "models")
+DATA_DIR = os.path.join(BASE_DIR, "data")
 FIGURES_DIR = os.path.join(BASE_DIR, "reports", "figures")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-# Load model pipeline
+# Resolve Model Path
+MODEL_PATH = os.path.join(MODELS_DIR, "ETA.joblib")
+if not os.path.exists(MODEL_PATH):
+    MODEL_PATH = os.path.join(BASE_DIR, "ETA.joblib")
 if not os.path.exists(MODEL_PATH):
     raise FileNotFoundError(f"Model file not found at {MODEL_PATH}")
 
+# Resolve Dataset Path
+DATASET_PATH = os.path.join(DATA_DIR, "Food_Delivery_Times.csv")
+if not os.path.exists(DATASET_PATH):
+    DATASET_PATH = os.path.join(BASE_DIR, "Food_Delivery_Times.csv")
+
 pipeline = joblib.load(MODEL_PATH)
-logger.info("Successfully loaded ML pipeline from ETA.joblib")
+logger.info(f"Successfully loaded ML pipeline from {MODEL_PATH}")
 
 # ==========================================
 # Dynamic Metrics & Model Evaluation Engine

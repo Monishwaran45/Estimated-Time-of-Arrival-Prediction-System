@@ -200,20 +200,34 @@ print("Successfully loaded xgb_model.json for cross-platform inference!")
 ## 12. Project Structure
 ```
 Estimated-Time-of-Arrival-Prediction-System/
-├── pyproject.toml              # Project configuration & dependencies
-├── requirements.txt            # Core Python dependencies
-├── README.md                   # Complete technical documentation
-├── main.py                     # Verification script
-├── ETA.joblib                  # Production Scikit-Learn + XGBoost pipeline (Joblib)
-├── ETA.pkl                     # Production Scikit-Learn + XGBoost pipeline (Pickle)
-├── xgb_model.json              # Native XGBoost booster JSON artifact for cross-platform inference
-├── Food_Delivery_Times.csv     # Main dataset containing 1,000 delivery records
-├── train.csv                   # Expanded training dataset split
-├── test.csv                    # Expanded test evaluation dataset split
-├── Sample_Submission.csv       # Sample submission benchmark format
-├── gps_tracking.csv            # GPS route & spatial tracking log sample
-├── Untitled-1.ipynb            # Primary notebook (EDA, Feature Pipeline, XGBoost Training & Evaluation)
-└── Untitled-2.ipynb            # Secondary notebook (Neural Network / LSTM Experimentation)
+├── data/                               # Raw and benchmark datasets
+│   ├── Food_Delivery_Times.csv         # Main dataset containing 1,000 delivery records
+│   ├── train.csv                       # Training dataset split
+│   ├── test.csv                        # Test evaluation dataset split
+│   ├── Sample_Submission.csv           # Benchmark submission format
+│   └── gps_tracking.csv                # GPS route tracking logs
+├── models/                             # Production ML artifacts
+│   ├── ETA.joblib                      # Scikit-Learn + XGBoost pipeline (Joblib)
+│   ├── ETA.pkl                         # Scikit-Learn + XGBoost pipeline (Pickle)
+│   └── xgb_model.json                  # Native XGBoost booster JSON artifact
+├── notebooks/                          # Interactive research & development notebooks
+│   ├── 01_eda_and_xgboost_pipeline.ipynb
+│   ├── 02_lstm_deep_learning.ipynb
+│   └── core.ipynb
+├── static/                             # Web Frontend (UI, CSS, JS)
+│   ├── index.html
+│   ├── style.css
+│   └── app.js
+├── reports/                            # SHAP and evaluation visualizations
+│   └── figures/
+├── scratch/                            # Test & evaluation stress-testing scripts
+│   ├── test_model_accuracy.py
+│   └── test_cab_ride_accuracy.py
+├── app.py                              # FastAPI backend & dynamic inference engine
+├── database.py                         # MySQL persistence & ORM manager
+├── pyproject.toml                      # Project metadata & dependencies
+├── requirements.txt                    # Python requirements
+└── README.md                           # Documentation
 ```
 
 ## 13. Safety & Operational SLA Notes
