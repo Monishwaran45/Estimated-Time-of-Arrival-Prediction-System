@@ -137,6 +137,25 @@ function initTabs() {
   });
 }
 
+// Helper for glowing pulse map markers
+function createPickupPinIcon(emoji = "🍕") {
+  return L.divIcon({
+    className: "uber-map-pin",
+    html: `<div class="custom-pulse-pin"><div class="pin-halo"></div><div class="pin-body">${emoji}</div></div>`,
+    iconSize: [38, 38],
+    iconAnchor: [19, 19]
+  });
+}
+
+function createDropoffPinIcon(emoji = "📍") {
+  return L.divIcon({
+    className: "uber-map-pin",
+    html: `<div class="custom-pulse-pin"><div class="pin-halo dropoff-halo"></div><div class="pin-body dropoff-body">${emoji}</div></div>`,
+    iconSize: [38, 38],
+    iconAnchor: [19, 19]
+  });
+}
+
 // ---------------------------------------------------------
 // Map Initialization
 // ---------------------------------------------------------
@@ -150,40 +169,32 @@ function initMap() {
 
   L.control.zoom({ position: 'topright' }).addTo(map);
 
-  // Uber-style Dark Matter / Positron tiles
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-    attribution: '&copy; CARTO &copy; OpenStreetMap contributors',
+  // Modern Dark Matter CartoDB tiles (clean, free, zero watermark)
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd',
     maxZoom: 19
   }).addTo(map);
 
-  // Uber Icon Style: Pickup (Circle) & Dropoff (Square)
-  const pickupIcon = L.divIcon({
-    className: "uber-map-pin",
-    html: `<div style="background: #000; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-size: 14px; color: #fff;">🍕</div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
-  });
-
-  const dropoffIcon = L.divIcon({
-    className: "uber-map-pin",
-    html: `<div style="background: #000; width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-size: 14px; color: #fff;">🏠</div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
-  });
+  // High-visibility glowing map pins
+  const pickupIcon = createPickupPinIcon(currentServiceMode === "ride" ? "🚕" : "🍕");
+  const dropoffIcon = createDropoffPinIcon("📍");
 
   restaurantMarker = L.marker(restaurantPos, { icon: pickupIcon, draggable: true }).addTo(map);
   customerMarker = L.marker(customerPos, { icon: dropoffIcon, draggable: true }).addTo(map);
 
-  restaurantMarker.bindPopup("<b>Central Kitchen Hub #402</b><br>Pickup Location");
-  customerMarker.bindPopup("<b>Customer Dropoff</b><br>Broadway, New York");
+  restaurantMarker.bindPopup("<b>Central Dispatch Hub</b><br>Pickup Location (Drag to change)");
+  customerMarker.bindPopup("<b>Customer Dropoff</b><br>Destination (Drag to change)");
 
-  // Uber Route Polyline (Bold Black with white border effect)
+  // High-visibility glowing route line
   routePolyline = L.polyline([restaurantPos, customerPos], {
-    color: '#000000',
+    color: '#00E676',
     weight: 5,
-    opacity: 0.9,
+    opacity: 0.95,
     lineCap: 'round',
-    dashArray: '8, 8'
+    lineJoin: 'round',
+    dashArray: '8, 8',
+    className: 'glowing-route-line'
   }).addTo(map);
 
   restaurantMarker.on('drag', updateRouteFromMap);
@@ -365,13 +376,7 @@ function setServiceMode(mode) {
 
     // Update map pin icon to Taxi
     if (restaurantMarker) {
-      const taxiIcon = L.divIcon({
-        className: "uber-map-pin",
-        html: `<div style="background: #000; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-size: 14px; color: #fff;">🚕</div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
-      });
-      restaurantMarker.setIcon(taxiIcon);
+      restaurantMarker.setIcon(createPickupPinIcon("🚕"));
     }
 
     renderPresetChips(RIDE_PRESETS);
@@ -399,13 +404,7 @@ function setServiceMode(mode) {
 
     // Update map pin icon to Pizza
     if (restaurantMarker) {
-      const pizzaIcon = L.divIcon({
-        className: "uber-map-pin",
-        html: `<div style="background: #000; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-size: 14px; color: #fff;">🍕</div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
-      });
-      restaurantMarker.setIcon(pizzaIcon);
+      restaurantMarker.setIcon(createPickupPinIcon("🍕"));
     }
 
     renderPresetChips(FOOD_PRESETS);

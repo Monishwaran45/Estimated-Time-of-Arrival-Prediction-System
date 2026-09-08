@@ -1,47 +1,67 @@
 /* ==========================================================================
-   UBER DESIGN SYSTEM - ETA PREDICTION & DISPATCH PLATFORM
-   Faithful recreation of Uber.com / Uber Direct / Uber Freight UI
+   ETA PREDICTOR PLATFORM - ULTRA PREMIUM DISPATCH DESIGN SYSTEM
+   Modern Dark Glassmorphism, Leaflet Spatial Telemetry & XGBoost Analytics
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
 :root {
-  /* Uber Core Palette */
-  --uber-black: #000000;
+  /* Core Obsidian Dark Palette */
+  --uber-black: #06080c;
+  --uber-surface: #0e1117;
+  --uber-surface-light: #161b22;
+  --uber-card-bg: rgba(18, 22, 30, 0.75);
+  --uber-card-border: rgba(255, 255, 255, 0.08);
+  --uber-card-hover-border: rgba(255, 255, 255, 0.18);
+  
   --uber-white: #ffffff;
-  --uber-gray-50: #f6f6f6;
-  --uber-gray-100: #eeeeee;
-  --uber-gray-200: #e2e2e2;
-  --uber-gray-300: #cbcbcb;
-  --uber-gray-400: #a6a6a6;
-  --uber-gray-500: #757575;
-  --uber-gray-600: #545454;
-  --uber-gray-700: #333333;
-  --uber-gray-800: #1f1f1f;
-  --uber-gray-900: #141414;
+  --uber-gray-100: #f0f3f6;
+  --uber-gray-200: #d0d7de;
+  --uber-gray-300: #afb8c1;
+  --uber-gray-400: #8c959f;
+  --uber-gray-500: #6e7781;
+  --uber-gray-600: #57606a;
+  --uber-gray-700: #323842;
+  --uber-gray-800: #21262d;
+  --uber-gray-900: #161b22;
 
-  /* Uber Functional Accents */
-  --uber-blue: #276ef1;
-  --uber-green: #05a357;
-  --uber-yellow: #ffc043;
-  --uber-red: #e11900;
-  --uber-green-bg: rgba(5, 163, 87, 0.12);
-  --uber-yellow-bg: rgba(255, 192, 67, 0.15);
-  --uber-red-bg: rgba(225, 25, 0, 0.12);
+  /* Neon Functional Accents */
+  --uber-green: #00E676;
+  --uber-green-glow: rgba(0, 230, 118, 0.35);
+  --uber-green-bg: rgba(0, 230, 118, 0.12);
 
-  /* Radius & Shadows */
-  --radius-pill: 500px;
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --uber-blue: #2979FF;
+  --uber-blue-glow: rgba(41, 121, 255, 0.35);
+  --uber-blue-bg: rgba(41, 121, 255, 0.12);
 
-  --shadow-uber-sm: 0 2px 8px rgba(0, 0, 0, 0.12);
-  --shadow-uber-md: 0 4px 16px rgba(0, 0, 0, 0.16);
-  --shadow-uber-lg: 0 8px 30px rgba(0, 0, 0, 0.28);
-  --shadow-card-dark: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --uber-yellow: #FFD600;
+  --uber-yellow-glow: rgba(255, 214, 0, 0.35);
+  --uber-yellow-bg: rgba(255, 214, 0, 0.12);
 
+  --uber-orange: #FF9100;
+  --uber-orange-glow: rgba(255, 145, 0, 0.35);
+
+  --uber-red: #FF3D71;
+  --uber-red-glow: rgba(255, 61, 113, 0.35);
+  --uber-red-bg: rgba(255, 61, 113, 0.12);
+
+  --uber-purple: #B388FF;
+
+  /* Radius Tokens */
+  --radius-pill: 9999px;
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  /* Elevation & Glows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.7);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+
+  /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -56,37 +76,59 @@
 body {
   font-family: var(--font-sans);
   background-color: var(--uber-black);
+  background-image: 
+    radial-gradient(circle at 15% 10%, rgba(41, 121, 255, 0.05) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(0, 230, 118, 0.04) 0%, transparent 45%);
   color: var(--uber-white);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, .uber-logo, .eta-headline {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 .mono {
   font-family: var(--font-mono);
 }
 
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--uber-black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--uber-gray-800);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--uber-gray-700);
+}
+
 /* ==========================================================================
-   Uber Global Navigation Bar
+   Global Navigation Header
    ========================================================================== */
 .uber-nav {
-  background-color: var(--uber-black);
-  border-bottom: 1px solid var(--uber-gray-800);
+  background: rgba(6, 8, 12, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--uber-card-border);
   position: sticky;
   top: 0;
   z-index: 1100;
   padding: 0 2rem;
-  height: 64px;
+  height: 68px;
 }
 
 .uber-nav-inner {
-  max-width: 1680px;
+  max-width: 1720px;
   height: 100%;
   margin: 0 auto;
   display: flex;
@@ -97,156 +139,95 @@ h1, h2, h3, h4, .uber-logo, .eta-headline {
 .uber-left {
   display: flex;
   align-items: center;
-  gap: 2.5rem;
+  gap: 2.25rem;
 }
 
 .uber-brand {
   display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.6rem;
   text-decoration: none;
   color: var(--uber-white);
 }
 
 .uber-logo {
-  font-size: 1.6rem;
+  font-size: 1.55rem;
   font-weight: 900;
-  letter-spacing: -1px;
-}
-
-.uber-product-tag {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--uber-gray-400);
-  padding-left: 0.5rem;
-  border-left: 1px solid var(--uber-gray-700);
+  letter-spacing: -0.8px;
+  background: linear-gradient(135deg, #ffffff 30%, #a0aec0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .uber-nav-menu {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--uber-card-border);
 }
 
 .uber-nav-link {
   background: transparent;
   border: none;
-  color: var(--uber-gray-300);
+  color: var(--uber-gray-400);
   font-family: var(--font-sans);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  padding: 0.55rem 1.1rem;
+  padding: 0.5rem 1.15rem;
   border-radius: var(--radius-pill);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .uber-nav-link:hover {
-  background-color: var(--uber-gray-900);
   color: var(--uber-white);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .uber-nav-link.active {
-  background-color: var(--uber-white);
+  background: var(--uber-white);
   color: var(--uber-black);
-}
-
-.service-mode-btn {
-  background: transparent;
-  color: var(--uber-gray-400);
-}
-
-.service-mode-btn:hover {
-  color: var(--uber-white);
-  background: rgba(255,255,255,0.08);
-}
-
-.service-mode-btn.active {
-  background: var(--uber-white) !important;
-  color: var(--uber-black) !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
 }
 
 .uber-right {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 0.85rem;
 }
 
 .uber-pill-badge {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: var(--uber-gray-900);
-  border: 1px solid var(--uber-gray-800);
-  padding: 0.45rem 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--uber-card-border);
+  padding: 0.45rem 0.95rem;
   border-radius: var(--radius-pill);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: var(--uber-gray-300);
+  color: var(--uber-gray-200);
+  transition: all 0.2s ease;
 }
 
-.pulse-dot-green {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--uber-green);
-  box-shadow: 0 0 10px var(--uber-green);
-}
-
-/* Subheader Banner */
-.uber-subheader {
-  background-color: var(--uber-gray-900);
-  border-bottom: 1px solid var(--uber-gray-800);
-  padding: 0.6rem 2rem;
-  font-size: 0.85rem;
-}
-
-.uber-subheader-inner {
-  max-width: 1680px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.uber-subheader-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: var(--uber-gray-300);
-}
-
-.uber-tag-solid {
-  background-color: var(--uber-white);
-  color: var(--uber-black);
-  font-size: 0.7rem;
-  font-weight: 800;
-  padding: 0.2rem 0.5rem;
-  border-radius: var(--radius-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.uber-metrics-strip {
-  display: flex;
-  gap: 1.5rem;
-  font-size: 0.8rem;
-  color: var(--uber-gray-400);
-}
-
-.uber-metrics-strip strong {
-  color: var(--uber-white);
+.uber-pill-badge:hover {
+  border-color: var(--uber-card-hover-border);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* ==========================================================================
-   Main Content & Hero Layout
+   Main Container
    ========================================================================== */
 main {
-  max-width: 1680px;
+  max-width: 1720px;
   width: 100%;
   margin: 0 auto;
   padding: 1.5rem 2rem 3rem 2rem;
@@ -255,47 +236,122 @@ main {
 
 .tab-content {
   display: none;
+  animation: fadeInTab 0.25s ease forwards;
 }
 
 .tab-content.active {
   display: block;
 }
 
-/* Uber Ride / Delivery Grid Layout */
+@keyframes fadeInTab {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Quick Scenarios Bar */
+.uber-presets-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1.25rem;
+  background: var(--uber-card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--uber-card-border);
+  border-radius: var(--radius-pill);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  box-shadow: var(--shadow-sm);
+}
+
+.uber-preset-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--uber-card-border);
+  color: var(--uber-gray-200);
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.uber-preset-chip:hover {
+  background: var(--uber-white);
+  color: var(--uber-black);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
+}
+
+/* ==========================================================================
+   3-Column Grid Layout (Simulator)
+   ========================================================================== */
 .uber-dispatch-layout {
   display: grid;
-  grid-template-columns: 440px 1fr 400px;
+  grid-template-columns: 430px 1fr 390px;
   gap: 1.5rem;
   align-items: start;
 }
 
-@media (max-width: 1400px) {
+@media (max-width: 1440px) {
   .uber-dispatch-layout {
-    grid-template-columns: 420px 1fr;
+    grid-template-columns: 400px 1fr 370px;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .uber-dispatch-layout {
+    grid-template-columns: 1fr 1fr;
   }
   .uber-hud-col {
     grid-column: span 2;
   }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 860px) {
   .uber-dispatch-layout {
     grid-template-columns: 1fr;
   }
   .uber-hud-col {
     grid-column: span 1;
   }
+  .uber-nav {
+    padding: 0 1rem;
+    height: auto;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+  .uber-nav-inner {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .uber-left {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
 }
 
 /* ==========================================================================
-   Uber Booking & Request Card (Left Column)
+   Cards & Panels
    ========================================================================== */
 .uber-card {
-  background-color: var(--uber-gray-900);
-  border: 1px solid var(--uber-gray-800);
+  background: var(--uber-card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--uber-card-border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  box-shadow: var(--shadow-card-dark);
+  box-shadow: var(--shadow-glass);
+  transition: border-color 0.2s ease;
+}
+
+.uber-card:hover {
+  border-color: var(--uber-card-hover-border);
 }
 
 .uber-card-title {
@@ -306,84 +362,63 @@ main {
 }
 
 .uber-card-subtitle {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--uber-gray-400);
+  line-height: 1.4;
   margin-bottom: 1.25rem;
 }
 
-/* Location Pickup & Dropoff Inputs (Iconic Uber Style) */
-.uber-location-box {
-  background-color: var(--uber-black);
-  border: 1px solid var(--uber-gray-800);
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
-  position: relative;
+/* Mode Toggle Switch */
+.service-mode-toggle {
+  display: flex;
+  gap: 4px;
   margin-bottom: 1.25rem;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--uber-card-border);
 }
 
-.uber-loc-row {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.4rem 0;
-}
-
-.uber-loc-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-}
-
-.uber-loc-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: var(--uber-white);
-}
-
-.uber-loc-line {
-  width: 2px;
-  height: 24px;
-  background-color: var(--uber-gray-700);
-}
-
-.uber-loc-square {
-  width: 10px;
-  height: 10px;
-  background-color: var(--uber-white);
-}
-
-.uber-loc-text {
+.service-mode-btn {
   flex: 1;
-}
-
-.uber-loc-label {
-  font-size: 0.7rem;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  border-radius: var(--radius-pill);
   font-weight: 700;
-  text-transform: uppercase;
-  color: var(--uber-gray-500);
-  letter-spacing: 0.5px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+  color: var(--uber-gray-400);
 }
 
-.uber-loc-val {
-  font-size: 0.95rem;
-  font-weight: 600;
+.service-mode-btn:hover {
   color: var(--uber-white);
+  background: rgba(255, 255, 255, 0.05);
 }
 
-/* Vehicle Types Options (Uber Moto / Auto / Courier / XL) */
+.service-mode-btn.active {
+  background: var(--uber-white) !important;
+  color: var(--uber-black) !important;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+/* Vehicle Grid Selector */
 .uber-vehicle-selector {
   margin-bottom: 1.25rem;
 }
 
 .uber-section-label {
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 800;
   text-transform: uppercase;
   color: var(--uber-gray-400);
-  letter-spacing: 0.5px;
-  margin-bottom: 0.6rem;
+  letter-spacing: 0.6px;
+  margin-bottom: 0.5rem;
   display: flex;
   justify-content: space-between;
 }
@@ -391,7 +426,7 @@ main {
 .uber-vehicles-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .vehicle-radio-item {
@@ -409,42 +444,47 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: var(--uber-black);
-  border: 2px solid var(--uber-gray-800);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1.5px solid var(--uber-card-border);
   border-radius: var(--radius-md);
   padding: 0.85rem 0.5rem;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   text-align: center;
 }
 
 .vehicle-emoji {
   font-size: 1.75rem;
   margin-bottom: 0.25rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
 .vehicle-name {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--uber-white);
 }
 
 .vehicle-desc {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--uber-gray-400);
   margin-top: 2px;
 }
 
-.vehicle-radio-item input[type="radio"]:checked + .vehicle-card-label {
-  border-color: var(--uber-white);
-  background-color: var(--uber-gray-800);
-}
-
 .vehicle-card-label:hover {
-  border-color: var(--uber-gray-600);
+  border-color: var(--uber-gray-500);
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-2px);
 }
 
-/* Sliders */
+.vehicle-radio-item input[type="radio"]:checked + .vehicle-card-label {
+  border-color: var(--uber-green);
+  background: rgba(0, 230, 118, 0.08);
+  box-shadow: 0 0 16px rgba(0, 230, 118, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Form Sliders */
 .uber-slider-group {
   margin-bottom: 1.15rem;
 }
@@ -457,15 +497,22 @@ main {
 }
 
 .uber-slider-title {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--uber-gray-300);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .uber-slider-val {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 800;
   color: var(--uber-white);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--uber-card-border);
 }
 
 .uber-range {
@@ -474,8 +521,9 @@ main {
   width: 100%;
   height: 6px;
   background: var(--uber-gray-800);
-  border-radius: 4px;
+  border-radius: var(--radius-pill);
   outline: none;
+  transition: all 0.2s ease;
 }
 
 .uber-range::-webkit-slider-thumb {
@@ -484,20 +532,27 @@ main {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--uber-white);
+  background: #ffffff;
+  border: 2px solid var(--uber-white);
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Weather & Traffic Segmented Tabs */
+.uber-range::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 18px rgba(0, 230, 118, 0.9), 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Segmented Controls (Weather & Traffic & Time) */
 .uber-segmented-control {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(55px, 1fr));
   gap: 0.35rem;
-  background-color: var(--uber-black);
-  padding: 0.3rem;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 4px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--uber-gray-800);
+  border: 1px solid var(--uber-card-border);
   margin-bottom: 1.15rem;
 }
 
@@ -516,32 +571,36 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.45rem 0.25rem;
+  padding: 0.5rem 0.25rem;
   border-radius: var(--radius-xs);
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 600;
   color: var(--uber-gray-400);
   cursor: pointer;
   transition: all 0.15s ease;
-}
-
-.uber-segmented-btn input[type="radio"]:checked + .uber-segmented-label {
-  background-color: var(--uber-white);
-  color: var(--uber-black);
+  user-select: none;
 }
 
 .uber-segmented-label:hover {
   color: var(--uber-white);
+  background: rgba(255, 255, 255, 0.04);
 }
 
-/* Uber Black Action Button */
+.uber-segmented-btn input[type="radio"]:checked + .uber-segmented-label {
+  background: var(--uber-white);
+  color: var(--uber-black);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
+}
+
+/* Main Action Button */
 .uber-btn-black {
   width: 100%;
-  background-color: var(--uber-white);
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
   color: var(--uber-black);
   border: none;
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   padding: 0.95rem;
   border-radius: var(--radius-sm);
@@ -550,13 +609,15 @@ main {
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 0.5rem;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
 }
 
 .uber-btn-black:hover {
-  background-color: var(--uber-gray-200);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+  background: #ffffff;
 }
 
 .uber-btn-black:active {
@@ -564,16 +625,16 @@ main {
 }
 
 /* ==========================================================================
-   Uber Map View (Center Column)
+   Map View (Center Column)
    ========================================================================== */
 .uber-map-container {
-  height: 540px;
+  height: 560px;
   width: 100%;
   border-radius: var(--radius-lg);
   overflow: hidden;
   position: relative;
-  border: 1px solid var(--uber-gray-800);
-  box-shadow: var(--shadow-card-dark);
+  border: 1px solid var(--uber-card-border);
+  box-shadow: var(--shadow-glass);
 }
 
 #map {
@@ -584,68 +645,153 @@ main {
 
 .uber-map-floating-panel {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  background: rgba(0, 0, 0, 0.88);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--uber-gray-800);
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  background: rgba(10, 13, 18, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--uber-card-border);
   padding: 0.75rem 1.25rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-pill);
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 1000;
+  box-shadow: var(--shadow-sm);
 }
 
 .uber-map-bottom-bar {
   position: absolute;
-  bottom: 16px;
-  left: 16px;
-  right: 16px;
-  background: rgba(0, 0, 0, 0.88);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--uber-gray-800);
-  padding: 0.75rem 1.25rem;
-  border-radius: var(--radius-md);
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  background: rgba(10, 13, 18, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--uber-card-border);
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-pill);
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 1000;
+  box-shadow: var(--shadow-sm);
 }
 
 .uber-btn-outline {
-  background: transparent;
-  border: 1px solid var(--uber-white);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--uber-white);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  padding: 0.45rem 1rem;
+  padding: 0.45rem 1.1rem;
   border-radius: var(--radius-pill);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .uber-btn-outline:hover {
   background: var(--uber-white);
   color: var(--uber-black);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
+}
+
+/* Custom Animated Map Pins */
+.uber-map-pin {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-pulse-pin {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+}
+
+.pin-halo {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(0, 230, 118, 0.45);
+  animation: radar-pulse 2.2s infinite ease-out;
+}
+
+.pin-halo.dropoff-halo {
+  background: rgba(41, 121, 255, 0.45);
+}
+
+.pin-body {
+  position: relative;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #0f141c;
+  border: 2px solid var(--uber-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(0, 230, 118, 0.55), 0 4px 12px rgba(0, 0, 0, 0.8);
+  font-size: 16px;
+  cursor: grab;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pin-body.dropoff-body {
+  border-color: var(--uber-blue);
+  box-shadow: 0 0 16px rgba(41, 121, 255, 0.55), 0 4px 12px rgba(0, 0, 0, 0.8);
+}
+
+.custom-pulse-pin:hover .pin-body {
+  transform: scale(1.18);
+}
+
+@keyframes radar-pulse {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  70% { transform: scale(1.7); opacity: 0; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+.glowing-route-line {
+  filter: drop-shadow(0 0 8px #00E676);
+  stroke-dasharray: 8, 8;
+  animation: dash 35s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -1000;
+  }
 }
 
 /* ==========================================================================
-   Uber Live ETA & Telemetry HUD (Right Column)
+   Live ETA & Telemetry HUD (Right Column)
    ========================================================================== */
+.uber-hud-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
 .uber-eta-badge-card {
-  background-color: var(--uber-black);
-  border: 1px solid var(--uber-gray-800);
-  border-radius: var(--radius-md);
-  padding: 1.5rem;
+  background: linear-gradient(180deg, rgba(22, 27, 34, 0.9) 0%, rgba(14, 17, 23, 0.95) 100%);
+  border: 1px solid var(--uber-card-border);
+  border-radius: var(--radius-lg);
+  padding: 1.6rem 1.25rem;
   text-align: center;
-  margin-bottom: 1.25rem;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-glass);
 }
 
 .uber-eta-badge-card::before {
@@ -655,16 +801,16 @@ main {
   left: 0;
   right: 0;
   height: 3px;
-  background-color: var(--uber-white);
+  background: linear-gradient(90deg, var(--uber-blue), var(--uber-green));
 }
 
 .uber-eta-label {
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   color: var(--uber-gray-400);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.25rem;
 }
 
 .uber-eta-number-wrap {
@@ -676,14 +822,15 @@ main {
 }
 
 .eta-headline {
-  font-size: 3.8rem;
+  font-size: 4rem;
   font-weight: 900;
   line-height: 1;
   color: var(--uber-white);
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
 }
 
 .eta-headline-unit {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--uber-gray-400);
 }
@@ -691,73 +838,78 @@ main {
 .uber-sla-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  background-color: var(--uber-gray-900);
-  border: 1px solid var(--uber-gray-800);
-  padding: 0.4rem 0.85rem;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--uber-card-border);
+  padding: 0.4rem 0.95rem;
   border-radius: var(--radius-pill);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--uber-gray-300);
-  margin-top: 0.5rem;
+  margin-top: 0.6rem;
 }
 
 .uber-sla-pill strong {
   color: var(--uber-white);
 }
 
-/* Uber Delay Risk Card */
+/* Delay Risk Card */
 .uber-risk-box {
-  background-color: var(--uber-black);
-  border: 1px solid var(--uber-gray-800);
-  border-radius: var(--radius-md);
-  padding: 1rem;
-  margin-bottom: 1.25rem;
+  background: var(--uber-card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--uber-card-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-glass);
 }
 
 .uber-risk-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
 }
 
 .uber-risk-tag {
   font-size: 0.72rem;
   font-weight: 800;
-  padding: 0.25rem 0.65rem;
-  border-radius: var(--radius-xs);
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-pill);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
 .uber-risk-bar {
-  height: 6px;
-  background-color: var(--uber-gray-800);
-  border-radius: 3px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-pill);
   overflow: hidden;
-  margin-top: 0.5rem;
+  margin: 0.5rem 0;
+  position: relative;
 }
 
 .uber-risk-fill {
   height: 100%;
   width: 25%;
-  background-color: var(--uber-green);
-  border-radius: 3px;
-  transition: width 0.4s ease, background-color 0.4s ease;
+  background: var(--uber-green);
+  border-radius: var(--radius-pill);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease;
+  box-shadow: 0 0 12px currentColor;
 }
 
-/* Factor Breakdown */
+/* Factor Breakdown Card */
 .uber-factors-card {
-  background-color: var(--uber-black);
-  border: 1px solid var(--uber-gray-800);
-  border-radius: var(--radius-md);
-  padding: 1.15rem;
+  background: var(--uber-card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--uber-card-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-glass);
 }
 
 .uber-factor-row {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
   margin-bottom: 0.85rem;
 }
 
@@ -777,69 +929,36 @@ main {
 }
 
 .uber-factor-track {
-  height: 4px;
-  background-color: var(--uber-gray-800);
-  border-radius: 2px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-pill);
   overflow: hidden;
 }
 
 .uber-factor-fill {
   height: 100%;
-  border-radius: 2px;
-  background-color: var(--uber-white);
-  transition: width 0.4s ease;
-}
-
-/* ==========================================================================
-   Presets Bar (Uber Scenario Chips)
-   ========================================================================== */
-.uber-presets-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  margin-bottom: 1.5rem;
-  overflow-x: auto;
-  padding-bottom: 0.25rem;
-}
-
-.uber-preset-chip {
-  background-color: var(--uber-gray-900);
-  border: 1px solid var(--uber-gray-800);
-  color: var(--uber-white);
-  font-size: 0.82rem;
-  font-weight: 600;
-  padding: 0.45rem 1rem;
   border-radius: var(--radius-pill);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.uber-preset-chip:hover {
-  background-color: var(--uber-gray-800);
-  border-color: var(--uber-gray-600);
+  background: var(--uber-blue);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ==========================================================================
-   Batch Orders Tab (Uber Direct / Freight style)
+   Batch Orders Tab (Manifests)
    ========================================================================== */
 .uber-dropzone {
-  border: 2px dashed var(--uber-gray-700);
-  background-color: var(--uber-black);
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.35);
   border-radius: var(--radius-lg);
-  padding: 3rem 1.5rem;
+  padding: 3.5rem 1.5rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   margin-bottom: 1.5rem;
 }
 
 .uber-dropzone:hover {
-  border-color: var(--uber-white);
-  background-color: var(--uber-gray-900);
+  border-color: var(--uber-green);
+  background: rgba(0, 230, 118, 0.04);
 }
 
 .uber-stats-grid {
@@ -850,22 +969,24 @@ main {
 }
 
 .uber-stat-card {
-  background-color: var(--uber-black);
-  border: 1px solid var(--uber-gray-800);
+  background: var(--uber-card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--uber-card-border);
   border-radius: var(--radius-md);
   padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .uber-stat-title {
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.74rem;
+  font-weight: 800;
   text-transform: uppercase;
   color: var(--uber-gray-400);
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
 .uber-stat-number {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 900;
   color: var(--uber-white);
   margin-top: 0.25rem;
@@ -873,8 +994,9 @@ main {
 
 .uber-table-wrap {
   overflow-x: auto;
-  border: 1px solid var(--uber-gray-800);
+  border: 1px solid var(--uber-card-border);
   border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .uber-table {
@@ -885,29 +1007,29 @@ main {
 }
 
 .uber-table th {
-  background-color: var(--uber-black);
-  padding: 0.85rem 1rem;
-  font-weight: 700;
+  background: rgba(22, 27, 34, 0.95);
+  padding: 0.9rem 1.1rem;
+  font-weight: 800;
   color: var(--uber-gray-400);
-  border-bottom: 1px solid var(--uber-gray-800);
+  border-bottom: 1px solid var(--uber-card-border);
   text-transform: uppercase;
   font-size: 0.7rem;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
 .uber-table td {
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid var(--uber-gray-800);
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--uber-card-border);
   color: var(--uber-white);
-  background-color: var(--uber-gray-900);
+  background: transparent;
 }
 
 .uber-table tr:hover td {
-  background-color: var(--uber-gray-800);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 /* ==========================================================================
-   Model Analytics & SHAP (Uber Michelangelo ML Platform style)
+   Model Analytics & SHAP
    ========================================================================== */
 .uber-shap-grid {
   display: grid;
@@ -916,24 +1038,27 @@ main {
 }
 
 .uber-plot-card {
-  background-color: var(--uber-gray-900);
-  border: 1px solid var(--uber-gray-800);
+  background: var(--uber-card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--uber-card-border);
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 1.35rem;
+  box-shadow: var(--shadow-glass);
 }
 
 .uber-plot-card img {
   width: 100%;
   height: auto;
   border-radius: var(--radius-sm);
-  margin-top: 0.75rem;
-  background-color: #fff;
+  margin-top: 0.85rem;
+  background-color: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* Footer */
 .uber-footer {
-  background-color: var(--uber-black);
-  border-top: 1px solid var(--uber-gray-800);
+  background: var(--uber-black);
+  border-top: 1px solid var(--uber-card-border);
   padding: 2rem;
   text-align: center;
   font-size: 0.8rem;
