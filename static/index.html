@@ -25,7 +25,6 @@
       <div class="uber-left">
         <a href="#" class="uber-brand">
           <span class="uber-logo">ETA Predictor</span>
-          <span class="uber-product-tag">Direct • Dispatch System</span>
         </a>
 
         <!-- Navigation Tabs -->
@@ -46,10 +45,6 @@
       </div>
 
       <div class="uber-right">
-        <div class="uber-pill-badge">
-          <div class="pulse-dot-green"></div>
-          <span>ML Engine: <strong>Active (MAE ±7.28m)</strong></span>
-        </div>
         <div class="uber-pill-badge mono" id="live-clock">
           <i class="fa-regular fa-clock"></i> --:--:--
         </div>
@@ -57,97 +52,69 @@
     </div>
   </header>
 
-  <!-- Subheader Banner -->
-  <section class="uber-subheader">
-    <div class="uber-subheader-inner">
-      <div class="uber-subheader-left">
-        <span class="uber-tag-solid">Logistics Engine</span>
-        <span>Machine Learning Dispatch — Predicting delivery duration with traffic, weather, and kitchen preparation dynamics.</span>
-      </div>
-      <div class="uber-metrics-strip">
-        <span>XGBoost Accuracy: <strong>R² 0.778</strong></span>
-        <span>Cross-Val: <strong>0.781 ± 0.012</strong></span>
-        <span>Inference: <strong>< 4.5ms</strong></span>
-      </div>
-    </div>
-  </section>
-
   <!-- Main Content Area -->
-  <main>
+  <main style="padding-top: 1.25rem;">
 
     <!-- TAB 1: RIDE & DELIVERY ESTIMATOR -->
     <div id="tab-simulator" class="tab-content active">
       
       <!-- Scenario Presets -->
-      <div class="uber-presets-bar">
+      <div class="uber-presets-bar" id="presets-container">
         <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--uber-gray-400); margin-right: 0.5rem;">Quick Scenarios:</span>
-        <button class="uber-preset-chip" onclick="applyPreset('quick-coffee')">☕ Morning Coffee Run (2.5 km)</button>
-        <button class="uber-preset-chip" onclick="applyPreset('rainy-dinner-rush')">🌧️ Monsoon Rush Hour (9.8 km)</button>
-        <button class="uber-preset-chip" onclick="applyPreset('suburban-night-drive')">🚗 Midnight Long-Range (18.2 km)</button>
-        <button class="uber-preset-chip" onclick="applyPreset('snowy-lunch-bottleneck')">❄️ Winter Storm Bottleneck (6.4 km)</button>
+        <div id="presets-chip-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <!-- Dynamically populated based on mode -->
+        </div>
       </div>
 
       <div class="uber-dispatch-layout">
         
         <!-- Left: Booking Request Widget -->
         <div class="uber-card">
-          <h2 class="uber-card-title">Delivery Request</h2>
-          <p class="uber-card-subtitle">Select route details to calculate instant ETA and arrival confidence</p>
+          
+          <!-- Dispatch Mode Toggle (Food Delivery vs Cab Ride) -->
+          <div class="service-mode-toggle" style="display: flex; gap: 6px; margin-bottom: 1.25rem; background: rgba(255,255,255,0.06); padding: 4px; border-radius: 9999px; border: 1px solid var(--uber-card-border);">
+            <button type="button" id="btn-mode-food" class="service-mode-btn active" onclick="setServiceMode('food')" style="flex: 1; padding: 0.5rem 0.75rem; border: none; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;">
+              <span>🍕 Food Delivery</span>
+            </button>
+            <button type="button" id="btn-mode-ride" class="service-mode-btn" onclick="setServiceMode('ride')" style="flex: 1; padding: 0.5rem 0.75rem; border: none; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;">
+              <span>🚕 Cab / Taxi Ride</span>
+            </button>
+          </div>
+
+          <h2 class="uber-card-title" id="form-card-title">Delivery Request</h2>
+          <p class="uber-card-subtitle" id="form-card-subtitle">Adjust trip dynamics for instantaneous machine learning prediction</p>
 
           <form id="eta-form" onsubmit="event.preventDefault(); calculateETA();">
-            
-            <!-- Location Box -->
-            <div class="uber-location-box">
-              <div class="uber-loc-row">
-                <div class="uber-loc-indicator">
-                  <div class="uber-loc-dot"></div>
-                  <div class="uber-loc-line"></div>
-                </div>
-                <div class="uber-loc-text">
-                  <div class="uber-loc-label">Pickup Location</div>
-                  <div class="uber-loc-val">🍕 Gourmet Central Kitchen #402</div>
-                </div>
-              </div>
-              <div class="uber-loc-row">
-                <div class="uber-loc-indicator">
-                  <div class="uber-loc-square"></div>
-                </div>
-                <div class="uber-loc-text">
-                  <div class="uber-loc-label">Delivery Destination</div>
-                  <div class="uber-loc-val">🏠 Customer Location (Broadway)</div>
-                </div>
-              </div>
-            </div>
 
             <!-- Fleet Vehicle Options -->
             <div class="uber-vehicle-selector">
               <div class="uber-section-label">
-                <span>Select Fleet Type</span>
+                <span id="vehicle-section-label">Select Fleet Vehicle</span>
                 <span style="color: var(--uber-white); font-weight: 800;">3 Options</span>
               </div>
-              <div class="uber-vehicles-grid">
+              <div class="uber-vehicles-grid" id="vehicles-grid-container">
                 <div class="vehicle-radio-item">
                   <input type="radio" name="vehicle" id="v-bike" value="Bike" checked onchange="debouncedPredict()">
                   <label class="vehicle-card-label" for="v-bike">
-                    <span class="vehicle-emoji">🚲</span>
-                    <span class="vehicle-name">Courier Bike</span>
-                    <span class="vehicle-desc">Fast courier</span>
+                    <span class="vehicle-emoji" id="v-bike-emoji">🚲</span>
+                    <span class="vehicle-name" id="v-bike-name">Courier Bike</span>
+                    <span class="vehicle-desc" id="v-bike-desc">Fast courier</span>
                   </label>
                 </div>
                 <div class="vehicle-radio-item">
                   <input type="radio" name="vehicle" id="v-scooter" value="Scooter" onchange="debouncedPredict()">
                   <label class="vehicle-card-label" for="v-scooter">
-                    <span class="vehicle-emoji">🛵</span>
-                    <span class="vehicle-name">Scooter</span>
-                    <span class="vehicle-desc">Standard</span>
+                    <span class="vehicle-emoji" id="v-scooter-emoji">🛵</span>
+                    <span class="vehicle-name" id="v-scooter-name">Scooter</span>
+                    <span class="vehicle-desc" id="v-scooter-desc">Standard fleet</span>
                   </label>
                 </div>
                 <div class="vehicle-radio-item">
                   <input type="radio" name="vehicle" id="v-car" value="Car" onchange="debouncedPredict()">
                   <label class="vehicle-card-label" for="v-car">
-                    <span class="vehicle-emoji">🚗</span>
-                    <span class="vehicle-name">Delivery Car</span>
-                    <span class="vehicle-desc">High volume</span>
+                    <span class="vehicle-emoji" id="v-car-emoji">🚗</span>
+                    <span class="vehicle-name" id="v-car-name">Delivery Car</span>
+                    <span class="vehicle-desc" id="v-car-desc">High volume</span>
                   </label>
                 </div>
               </div>
@@ -162,13 +129,13 @@
               <input type="range" class="uber-range" id="input-distance" min="0.5" max="35.0" step="0.1" value="5.0" oninput="onDistanceSliderChange(this.value)">
             </div>
 
-            <!-- Prep Time Slider -->
-            <div class="uber-slider-group">
+            <!-- Prep Time Slider (Hidden in Cab Ride Mode) -->
+            <div class="uber-slider-group" id="group-prep-time">
               <div class="uber-slider-header">
-                <span class="uber-slider-title"><i class="fa-solid fa-kitchen-set"></i> Kitchen Prep Time</span>
+                <span class="uber-slider-title" id="prep-slider-title"><i class="fa-solid fa-kitchen-set"></i> Kitchen Prep Time</span>
                 <span class="uber-slider-val mono" id="val-prep">15 min</span>
               </div>
-              <input type="range" class="uber-range" id="input-prep" min="2" max="60" step="1" value="15" oninput="document.getElementById('val-prep').innerText = this.value + ' min'; debouncedPredict();">
+              <input type="range" class="uber-range" id="input-prep" min="1" max="60" step="1" value="15" oninput="document.getElementById('val-prep').innerText = this.value + ' min'; debouncedPredict();">
             </div>
 
             <!-- Courier Experience Slider -->
@@ -317,9 +284,9 @@
               Trip Bottleneck Breakdown
             </div>
 
-            <div class="uber-factor-row">
+            <div class="uber-factor-row" id="factor-row-prep">
               <div class="uber-factor-meta">
-                <span>🍳 Kitchen Preparation</span>
+                <span id="factor-prep-label">🍳 Kitchen Preparation</span>
                 <strong id="factor-prep" class="mono">15.0 min</strong>
               </div>
               <div class="uber-factor-track">

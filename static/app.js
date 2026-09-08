@@ -19,12 +19,47 @@ let presetsData = {};
 
 document.addEventListener("DOMContentLoaded", () => {
   initLiveClock();
+  checkDatabaseStatus();
   initTabs();
   initMap();
   loadPresets();
   calculateETA();
   initDragDrop();
 });
+
+// ---------------------------------------------------------
+// Live Database & System Health Status
+// ---------------------------------------------------------
+async function checkDatabaseStatus() {
+  const badgeText = document.getElementById("db-status-text");
+  const pulseDot = document.getElementById("db-pulse-dot");
+  const mlBadge = document.getElementById("ml-engine-badge");
+
+  try {
+    const res = await fetch("/api/db/status");
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === "connected") {
+        if (badgeText) badgeText.innerHTML = `DB: <strong style="color: var(--uber-green);">${data.database_type}</strong> (${data.total_predictions_stored} logged)`;
+        if (pulseDot) pulseDot.className = "pulse-dot-green";
+      } else {
+        if (badgeText) badgeText.innerHTML = `DB: <strong style="color: var(--uber-yellow);">${data.database_type || "Offline"}</strong>`;
+        if (pulseDot) pulseDot.style.background = "var(--uber-yellow)";
+      }
+    }
+    
+    // Fetch dynamic model metrics
+    const healthRes = await fetch("/api/health");
+    if (healthRes.ok) {
+      const health = await healthRes.json();
+      if (mlBadge) {
+        mlBadge.innerHTML = `ML: <strong>Active (MAE ±${health.dynamic_mae_min || '7.28'}m)</strong>`;
+      }
+    }
+  } catch (err) {
+    if (badgeText) badgeText.innerHTML = `DB: <strong style="color: var(--uber-red);">Disconnected</strong>`;
+  }
+}
 
 // ---------------------------------------------------------
 // Live Clock
@@ -226,9 +261,145 @@ function simulateTrip() {
 }
 
 // ---------------------------------------------------------
+// Service Mode Switching (Food Delivery vs Cab Ride)
+// ---------------------------------------------------------
+let currentServiceMode = "food";
+
+const FOOD_PRESETS = [
+  { id: "quick-coffee", label: "☕ Morning Coffee Run (2.5 km)", data: { Distance_km: 2.5, Weather: "Clear", Traffic_Level: "Low", Time_of_Day: "Morning", Vehicle_Type: "Scooter", Preparation_Time_min: 7.0, Courier_Experience_yrs: 4.5 } },
+  { id: "rainy-dinner-rush", label: "🌧️ Monsoon Rush Hour (9.8 km)", data: { Distance_km: 9.8, Weather: "Rainy", Traffic_Level: "High", Time_of_Day: "Evening", Vehicle_Type: "Bike", Preparation_Time_min: 25.0, Courier_Experience_yrs: 1.5 } },
+  { id: "suburban-night-drive", label: "🚗 Midnight Long-Range (18.2 km)", data: { Distance_km: 18.2, Weather: "Clear", Traffic_Level: "Low", Time_of_Day: "Night", Vehicle_Type: "Car", Preparation_Time_min: 14.0, Courier_Experience_yrs: 8.0 } },
+  { id: "snowy-lunch-bottleneck", label: "❄️ Winter Storm Bottleneck (6.4 km)", data: { Distance_km: 6.4, Weather: "Snowy", Traffic_Level: "Medium", Time_of_Day: "Afternoon", Vehicle_Type: "Car", Preparation_Time_min: 32.0, Courier_Experience_yrs: 2.0 } }
+];
+
+const RIDE_PRESETS = [
+  { id: "airport-express", label: "✈️ Airport Express (22.5 km)", data: { Distance_km: 22.5, Weather: "Clear", Traffic_Level: "Low", Time_of_Day: "Night", Vehicle_Type: "Car", Preparation_Time_min: 1.0, Courier_Experience_yrs: 7.0 } },
+  { id: "downtown-rush", label: "🏢 Downtown Peak Rush (6.5 km)", data: { Distance_km: 6.5, Weather: "Clear", Traffic_Level: "High", Time_of_Day: "Evening", Vehicle_Type: "Car", Preparation_Time_min: 1.0, Courier_Experience_yrs: 3.5 } },
+  { id: "rainy-commute", label: "🌧️ Rainy City Commute (11.0 km)", data: { Distance_km: 11.0, Weather: "Rainy", Traffic_Level: "High", Time_of_Day: "Morning", Vehicle_Type: "Car", Preparation_Time_min: 1.0, Courier_Experience_yrs: 4.0 } },
+  { id: "moto-express", label: "🛵 Moto Taxi Quick Ride (4.0 km)", data: { Distance_km: 4.0, Weather: "Clear", Traffic_Level: "Medium", Time_of_Day: "Afternoon", Vehicle_Type: "Bike", Preparation_Time_min: 1.0, Courier_Experience_yrs: 5.0 } }
+];
+
+function setServiceMode(mode) {
+  currentServiceMode = mode;
+
+  const btnFood = document.getElementById("btn-mode-food");
+  const btnRide = document.getElementById("btn-mode-ride");
+  const cardTitle = document.getElementById("form-card-title");
+  const cardSubtitle = document.getElementById("form-card-subtitle");
+  const prepGroup = document.getElementById("group-prep-time");
+  const factorPrepLabel = document.getElementById("factor-prep-label");
+  const vehicleLabel = document.getElementById("vehicle-section-label");
+
+  // Vehicle labels & emojis
+  const vBikeName = document.getElementById("v-bike-name");
+  const vBikeDesc = document.getElementById("v-bike-desc");
+  const vBikeEmoji = document.getElementById("v-bike-emoji");
+
+  const vScooterName = document.getElementById("v-scooter-name");
+  const vScooterDesc = document.getElementById("v-scooter-desc");
+  const vScooterEmoji = document.getElementById("v-scooter-emoji");
+
+  const vCarName = document.getElementById("v-car-name");
+  const vCarDesc = document.getElementById("v-car-desc");
+  const vCarEmoji = document.getElementById("v-car-emoji");
+
+  if (mode === "ride") {
+    btnFood?.classList.remove("active");
+    btnRide?.classList.add("active");
+
+    if (cardTitle) cardTitle.innerHTML = "🚕 Cab Ride Request";
+    if (cardSubtitle) cardSubtitle.innerText = "Real-time passenger transit ETA, traffic friction, and arrival confidence";
+    if (prepGroup) prepGroup.style.display = "none";
+    if (factorPrepLabel) factorPrepLabel.innerText = "🚶 Passenger Boarding";
+    if (vehicleLabel) vehicleLabel.innerText = "Select Cab / Ride Fleet";
+
+    if (vBikeName) vBikeName.innerText = "Moto Taxi";
+    if (vBikeDesc) vBikeDesc.innerText = "Solo rapid trip";
+    if (vBikeEmoji) vBikeEmoji.innerText = "🛵";
+
+    if (vScooterName) vScooterName.innerText = "Comfort SUV";
+    if (vScooterDesc) vScooterDesc.innerText = "Extra legroom";
+    if (vScooterEmoji) vScooterEmoji.innerText = "🚙";
+
+    if (vCarName) vCarName.innerText = "City Sedan";
+    if (vCarDesc) vCarDesc.innerText = "Standard cab";
+    if (vCarEmoji) vCarEmoji.innerText = "🚕";
+
+    // Select car by default
+    const carRadio = document.getElementById("v-car");
+    if (carRadio) carRadio.checked = true;
+
+    // Update map pin icon to Taxi
+    if (restaurantMarker) {
+      const taxiIcon = L.divIcon({
+        className: "uber-map-pin",
+        html: `<div style="background: #000; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-size: 14px; color: #fff;">🚕</div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+      restaurantMarker.setIcon(taxiIcon);
+    }
+
+    renderPresetChips(RIDE_PRESETS);
+  } else {
+    btnRide?.classList.remove("active");
+    btnFood?.classList.add("active");
+
+    if (cardTitle) cardTitle.innerHTML = "Delivery Request";
+    if (cardSubtitle) cardSubtitle.innerText = "Adjust trip dynamics for instantaneous machine learning prediction";
+    if (prepGroup) prepGroup.style.display = "block";
+    if (factorPrepLabel) factorPrepLabel.innerText = "🍳 Kitchen Preparation";
+    if (vehicleLabel) vehicleLabel.innerText = "Select Fleet Vehicle";
+
+    if (vBikeName) vBikeName.innerText = "Courier Bike";
+    if (vBikeDesc) vBikeDesc.innerText = "Fast courier";
+    if (vBikeEmoji) vBikeEmoji.innerText = "🚲";
+
+    if (vScooterName) vScooterName.innerText = "Scooter";
+    if (vScooterDesc) vScooterDesc.innerText = "Standard fleet";
+    if (vScooterEmoji) vScooterEmoji.innerText = "🛵";
+
+    if (vCarName) vCarName.innerText = "Delivery Car";
+    if (vCarDesc) vCarDesc.innerText = "High volume";
+    if (vCarEmoji) vCarEmoji.innerText = "🚗";
+
+    // Update map pin icon to Pizza
+    if (restaurantMarker) {
+      const pizzaIcon = L.divIcon({
+        className: "uber-map-pin",
+        html: `<div style="background: #000; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-size: 14px; color: #fff;">🍕</div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+      restaurantMarker.setIcon(pizzaIcon);
+    }
+
+    renderPresetChips(FOOD_PRESETS);
+  }
+
+  calculateETA();
+}
+
+function renderPresetChips(presetList) {
+  const container = document.getElementById("presets-chip-group");
+  if (!container) return;
+
+  container.innerHTML = "";
+  presetList.forEach(p => {
+    presetsData[p.id] = p.data;
+    const btn = document.createElement("button");
+    btn.className = "uber-preset-chip";
+    btn.innerText = p.label;
+    btn.onclick = () => applyPreset(p.id);
+    container.appendChild(btn);
+  });
+}
+
+// ---------------------------------------------------------
 // Preset Scenarios
 // ---------------------------------------------------------
 async function loadPresets() {
+  renderPresetChips(FOOD_PRESETS);
   try {
     const res = await fetch("/api/presets");
     if (res.ok) {
@@ -247,8 +418,9 @@ function applyPreset(presetId) {
   document.getElementById("input-distance").value = data.Distance_km;
   onDistanceSliderChange(data.Distance_km);
 
-  document.getElementById("input-prep").value = data.Preparation_Time_min;
-  document.getElementById("val-prep").innerText = `${data.Preparation_Time_min} min`;
+  const prepVal = currentServiceMode === "ride" ? 1.0 : (data.Preparation_Time_min || 15.0);
+  document.getElementById("input-prep").value = prepVal;
+  document.getElementById("val-prep").innerText = `${prepVal} min`;
 
   document.getElementById("input-exp").value = data.Courier_Experience_yrs;
   document.getElementById("val-exp").innerText = `${data.Courier_Experience_yrs} yrs`;
@@ -279,9 +451,10 @@ function debouncedPredict() {
 }
 
 function getFormData() {
+  const prepTime = currentServiceMode === "ride" ? 1.0 : parseFloat(document.getElementById("input-prep").value || 1.0);
   return {
     Distance_km: parseFloat(document.getElementById("input-distance").value),
-    Preparation_Time_min: parseFloat(document.getElementById("input-prep").value),
+    Preparation_Time_min: prepTime,
     Courier_Experience_yrs: parseFloat(document.getElementById("input-exp").value),
     Weather: document.querySelector('input[name="weather"]:checked')?.value || "Clear",
     Traffic_Level: document.querySelector('input[name="traffic"]:checked')?.value || "Medium",
@@ -333,6 +506,7 @@ function renderPrediction(data) {
   currentETA = targetEta;
 
   document.getElementById("sla-range").innerText = `${data.lower_sla_min} to ${data.upper_sla_min} min`;
+  checkDatabaseStatus();
 
   // Risk Badge
   const badge = document.getElementById("risk-badge-display");

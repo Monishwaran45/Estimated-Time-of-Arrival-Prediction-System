@@ -154,6 +154,22 @@ h1, h2, h3, h4, .uber-logo, .eta-headline {
   color: var(--uber-black);
 }
 
+.service-mode-btn {
+  background: transparent;
+  color: var(--uber-gray-400);
+}
+
+.service-mode-btn:hover {
+  color: var(--uber-white);
+  background: rgba(255,255,255,0.08);
+}
+
+.service-mode-btn.active {
+  background: var(--uber-white) !important;
+  color: var(--uber-black) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
 .uber-right {
   display: flex;
   align-items: center;
