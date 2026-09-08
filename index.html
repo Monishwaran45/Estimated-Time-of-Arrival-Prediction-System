@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ETA Predictor | Machine Learning Logistics & Dispatch System</title>
+  <meta name="description" content="Production machine learning platform for food delivery Estimated Time of Arrival (ETA) with real-time routing, XGBoost model pipeline, and SHAP explainability.">
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><circle cx=%2216%22 cy=%2216%22 r=%2216%22 fill=%22%23000000%22/><circle cx=%2216%22 cy=%2216%22 r=%2210%22 fill=%22none%22 stroke=%22%23ffffff%22 stroke-width=%222.5%22/><polyline points=%2216 10 16 16 20 18%22 fill=%22none%22 stroke=%22%23ffffff%22 stroke-width=%222.5%22 stroke-linecap=%22round%22/></svg>">
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- Global Navbar -->
+  <header class="uber-nav">
+    <div class="uber-nav-inner">
+      <div class="uber-left">
+        <a href="#" class="uber-brand">
+          <span class="uber-logo">ETA Predictor</span>
+        </a>
+
+        <!-- Navigation Tabs -->
+        <nav class="uber-nav-menu" role="tablist">
+          <button class="uber-nav-link active" data-tab="simulator" role="tab">
+            <i class="fa-solid fa-car-side"></i> Ride & Delivery
+          </button>
+          <button class="uber-nav-link" data-tab="batch" role="tab">
+            <i class="fa-solid fa-boxes-stacked"></i> Batch Manifests
+          </button>
+          <button class="uber-nav-link" data-tab="analytics" role="tab">
+            <i class="fa-solid fa-chart-line"></i> Model & SHAP
+          </button>
+          <button class="uber-nav-link" data-tab="history" role="tab">
+            <i class="fa-solid fa-clock-rotate-left"></i> Activity Log
+          </button>
+        </nav>
+      </div>
+
+      <div class="uber-right" style="display: flex; align-items: center; gap: 0.75rem;">
+        <button id="backend-config-btn" onclick="configureBackendUrl()" class="uber-pill-badge" style="cursor: pointer; background: rgba(255,255,255,0.06); border: 1px solid var(--uber-gray-700); color: var(--uber-white); font-size: 0.75rem; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s ease;" title="Configure Backend API (Render / Local URL)">
+          <span id="db-pulse-dot" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--uber-green);"></span>
+          <span id="db-status-text">Connecting...</span>
+          <i class="fa-solid fa-gear" style="font-size: 0.7rem; color: var(--uber-gray-400); margin-left: 2px;"></i>
+        </button>
+        <div class="uber-pill-badge mono" id="live-clock">
+          <i class="fa-regular fa-clock"></i> --:--:--
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main style="padding-top: 1.25rem;">
+
+    <!-- TAB 1: RIDE & DELIVERY ESTIMATOR -->
+    <div id="tab-simulator" class="tab-content active">
+      
+      <!-- Scenario Presets -->
+      <div class="uber-presets-bar" id="presets-container">
+        <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--uber-gray-400); margin-right: 0.5rem;">Quick Scenarios:</span>
+        <div id="presets-chip-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <!-- Dynamically populated based on mode -->
+        </div>
+      </div>
+
+      <div class="uber-dispatch-layout">
+        
+        <!-- Left: Booking Request Widget -->
+        <div class="uber-card">
+          
+          <!-- Dispatch Mode Toggle (Food Delivery vs Cab Ride) -->
+          <div class="service-mode-toggle" style="display: flex; gap: 6px; margin-bottom: 1.25rem; background: rgba(255,255,255,0.06); padding: 4px; border-radius: 9999px; border: 1px solid var(--uber-card-border);">
+            <button type="button" id="btn-mode-food" class="service-mode-btn active" onclick="setServiceMode('food')" style="flex: 1; padding: 0.5rem 0.75rem; border: none; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;">
+              <span>🍕 Food Delivery</span>
+            </button>
+            <button type="button" id="btn-mode-ride" class="service-mode-btn" onclick="setServiceMode('ride')" style="flex: 1; padding: 0.5rem 0.75rem; border: none; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;">
+              <span>🚕 Cab / Taxi Ride</span>
+            </button>
+          </div>
+
+          <h2 class="uber-card-title" id="form-card-title">Delivery Request</h2>
+          <p class="uber-card-subtitle" id="form-card-subtitle">Adjust trip dynamics for instantaneous machine learning prediction</p>
+
+          <form id="eta-form" onsubmit="event.preventDefault(); calculateETA();">
+
+            <!-- Fleet Vehicle Options -->
+            <div class="uber-vehicle-selector">
+              <div class="uber-section-label">
+                <span id="vehicle-section-label">Select Fleet Vehicle</span>
+                <span style="color: var(--uber-white); font-weight: 800;">3 Options</span>
+              </div>
+              <div class="uber-vehicles-grid" id="vehicles-grid-container">
+                <div class="vehicle-radio-item">
+                  <input type="radio" name="vehicle" id="v-bike" value="Bike" checked onchange="debouncedPredict()">
+                  <label class="vehicle-card-label" for="v-bike">
+                    <span class="vehicle-emoji" id="v-bike-emoji">🚲</span>
+                    <span class="vehicle-name" id="v-bike-name">Courier Bike</span>
+                    <span class="vehicle-desc" id="v-bike-desc">Fast courier</span>
+                  </label>
+                </div>
+                <div class="vehicle-radio-item">
+                  <input type="radio" name="vehicle" id="v-scooter" value="Scooter" onchange="debouncedPredict()">
+                  <label class="vehicle-card-label" for="v-scooter">
+                    <span class="vehicle-emoji" id="v-scooter-emoji">🛵</span>
+                    <span class="vehicle-name" id="v-scooter-name">Scooter</span>
+                    <span class="vehicle-desc" id="v-scooter-desc">Standard fleet</span>
+                  </label>
+                </div>
+                <div class="vehicle-radio-item">
+                  <input type="radio" name="vehicle" id="v-car" value="Car" onchange="debouncedPredict()">
+                  <label class="vehicle-card-label" for="v-car">
+                    <span class="vehicle-emoji" id="v-car-emoji">🚗</span>
+                    <span class="vehicle-name" id="v-car-name">Delivery Car</span>
+                    <span class="vehicle-desc" id="v-car-desc">High volume</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Distance Slider -->
+            <div class="uber-slider-group">
+              <div class="uber-slider-header">
+                <span class="uber-slider-title"><i class="fa-solid fa-route"></i> Route Distance</span>
+                <span class="uber-slider-val mono" id="val-distance">5.0 km</span>
+              </div>
+              <input type="range" class="uber-range" id="input-distance" min="0.5" max="35.0" step="0.1" value="5.0" oninput="onDistanceSliderChange(this.value)">
+            </div>
+
+            <!-- Prep Time Slider (Hidden in Cab Ride Mode) -->
+            <div class="uber-slider-group" id="group-prep-time">
+              <div class="uber-slider-header">
+                <span class="uber-slider-title" id="prep-slider-title"><i class="fa-solid fa-kitchen-set"></i> Kitchen Prep Time</span>
+                <span class="uber-slider-val mono" id="val-prep">15 min</span>
+              </div>
+              <input type="range" class="uber-range" id="input-prep" min="1" max="60" step="1" value="15" oninput="document.getElementById('val-prep').innerText = this.value + ' min'; debouncedPredict();">
+            </div>
+
+            <!-- Courier Experience Slider -->
+            <div class="uber-slider-group">
+              <div class="uber-slider-header">
+                <span class="uber-slider-title"><i class="fa-solid fa-star"></i> Driver Tenure / Exp.</span>
+                <span class="uber-slider-val mono" id="val-exp">3.0 yrs</span>
+              </div>
+              <input type="range" class="uber-range" id="input-exp" min="0.1" max="15.0" step="0.5" value="3.0" oninput="document.getElementById('val-exp').innerText = this.value + ' yrs'; debouncedPredict();">
+            </div>
+
+            <!-- Weather Segmented -->
+            <div class="uber-section-label">Weather Condition</div>
+            <div class="uber-segmented-control">
+              <div class="uber-segmented-btn">
+                <input type="radio" name="weather" id="w-clear" value="Clear" checked onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="w-clear">☀️ Clear</label>
+              </div>
+              <div class="uber-segmented-btn">
+                <input type="radio" name="weather" id="w-rainy" value="Rainy" onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="w-rainy">🌧️ Rain</label>
+              </div>
+              <div class="uber-segmented-btn">
+                <input type="radio" name="weather" id="w-snowy" value="Snowy" onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="w-snowy">❄️ Snow</label>
+              </div>
+              <div class="uber-segmented-btn">
+                <input type="radio" name="weather" id="w-foggy" value="Foggy" onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="w-foggy">🌫️ Fog</label>
+              </div>
+              <div class="uber-segmented-btn">
+                <input type="radio" name="weather" id="w-windy" value="Windy" onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="w-windy">💨 Wind</label>
+              </div>
+            </div>
+
+            <!-- Traffic Segmented -->
+            <div class="uber-section-label">Traffic Congestion</div>
+            <div class="uber-segmented-control" style="grid-template-columns: repeat(3, 1fr);">
+              <div class="uber-segmented-btn">
+                <input type="radio" name="traffic" id="t-low" value="Low" onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="t-low">🟢 Low</label>
+              </div>
+              <div class="uber-segmented-btn">
+                <input type="radio" name="traffic" id="t-med" value="Medium" checked onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="t-med">🟡 Medium</label>
+              </div>
+              <div class="uber-segmented-btn">
+                <input type="radio" name="traffic" id="t-high" value="High" onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="t-high">🔴 High</label>
+              </div>
+            </div>
+
+            <!-- Time of Day -->
+            <div class="uber-section-label">Dispatch Time of Day</div>
+            <div class="uber-segmented-control" style="grid-template-columns: repeat(4, 1fr);">
+              <div class="uber-segmented-btn">
+                <input type="radio" name="timeofday" id="tod-morn" value="Morning" onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="tod-morn">🌅 Morn</label>
+              </div>
+              <div class="uber-segmented-btn">
+                <input type="radio" name="timeofday" id="tod-aft" value="Afternoon" onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="tod-aft">☀️ Noon</label>
+              </div>
+              <div class="uber-segmented-btn">
+                <input type="radio" name="timeofday" id="tod-eve" value="Evening" checked onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="tod-eve">🌆 Eve</label>
+              </div>
+              <div class="uber-segmented-btn">
+                <input type="radio" name="timeofday" id="tod-night" value="Night" onchange="debouncedPredict()">
+                <label class="uber-segmented-label" for="tod-night">🌙 Night</label>
+              </div>
+            </div>
+
+            <button type="submit" class="uber-btn-black">
+              <span>Calculate Predicted ETA</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </form>
+        </div>
+
+        <!-- Center: Map View -->
+        <div>
+          <div class="uber-map-container">
+            <div id="map"></div>
+            
+            <!-- Top Map Floating Bar -->
+            <div class="uber-map-floating-panel">
+              <div style="font-size: 0.85rem; font-weight: 700;">
+                <i class="fa-solid fa-location-crosshairs" style="color: var(--uber-white);"></i> Live Spatial Routing
+              </div>
+              <div style="font-size: 0.8rem; color: var(--uber-gray-400);">
+                Distance: <strong class="mono" style="color: var(--uber-white);" id="map-dist-badge">5.0 km</strong>
+              </div>
+            </div>
+
+            <!-- Bottom Map Bar with Simulation Button -->
+            <div class="uber-map-bottom-bar">
+              <div style="font-size: 0.82rem; color: var(--uber-gray-300);">
+                <span><i class="fa-solid fa-arrows-up-down-left-right"></i> Drag pins to test different distances</span>
+              </div>
+              <button class="uber-btn-outline" id="btn-simulate" onclick="simulateTrip()">
+                <i class="fa-solid fa-play"></i> Simulate Transit
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: ETA Telemetry HUD -->
+        <div class="uber-hud-col">
+          
+          <!-- Hero Estimated Time -->
+          <div class="uber-eta-badge-card">
+            <div class="uber-eta-label">Estimated Delivery Time</div>
+            <div class="uber-eta-number-wrap">
+              <span class="eta-headline mono" id="eta-display-num">--</span>
+              <span class="eta-headline-unit">min</span>
+            </div>
+            <div class="uber-sla-pill">
+              <i class="fa-solid fa-shield-check" style="color: var(--uber-green);"></i>
+              <span>Guaranteed SLA: <strong id="sla-range" class="mono">-- to -- min</strong></span>
+            </div>
+          </div>
+
+          <!-- Delay Risk Level -->
+          <div class="uber-risk-box">
+            <div class="uber-risk-header">
+              <span style="font-size: 0.75rem; font-weight: 700; color: var(--uber-gray-400); text-transform: uppercase;">Delay Risk Assessment</span>
+              <span class="uber-risk-tag" id="risk-badge-display" style="background: var(--uber-green-bg); color: var(--uber-green);">
+                LOW RISK
+              </span>
+            </div>
+            <div class="uber-risk-bar">
+              <div class="uber-risk-fill" id="risk-bar-fill" style="width: 25%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--uber-gray-500); margin-top: 6px;">
+              <span>Fast (<35m)</span>
+              <span>Standard (35-60m)</span>
+              <span>Delay Warning (>60m)</span>
+            </div>
+          </div>
+
+          <!-- Bottleneck Factors Breakdown -->
+          <div class="uber-factors-card">
+            <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--uber-gray-400); margin-bottom: 0.85rem;">
+              Trip Bottleneck Breakdown
+            </div>
+
+            <div class="uber-factor-row" id="factor-row-prep">
+              <div class="uber-factor-meta">
+                <span id="factor-prep-label">🍳 Kitchen Preparation</span>
+                <strong id="factor-prep" class="mono">15.0 min</strong>
+              </div>
+              <div class="uber-factor-track">
+                <div class="uber-factor-fill" id="factor-bar-prep" style="width: 35%;"></div>
+              </div>
+            </div>
+
+            <div class="uber-factor-row">
+              <div class="uber-factor-meta">
+                <span>🛣️ Route Base Transit</span>
+                <strong id="factor-transit" class="mono">11.0 min</strong>
+              </div>
+              <div class="uber-factor-track">
+                <div class="uber-factor-fill" id="factor-bar-transit" style="width: 30%;"></div>
+              </div>
+            </div>
+
+            <div class="uber-factor-row">
+              <div class="uber-factor-meta">
+                <span>🚦 Traffic Delay Friction</span>
+                <strong id="factor-traffic" class="mono">+8.5 min</strong>
+              </div>
+              <div class="uber-factor-track">
+                <div class="uber-factor-fill" id="factor-bar-traffic" style="width: 25%; background-color: var(--uber-yellow);"></div>
+              </div>
+            </div>
+
+            <div class="uber-factor-row">
+              <div class="uber-factor-meta">
+                <span>🌧️ Weather Impact</span>
+                <strong id="factor-weather" class="mono">+1.0 min</strong>
+              </div>
+              <div class="uber-factor-track">
+                <div class="uber-factor-fill" id="factor-bar-weather" style="width: 10%;"></div>
+              </div>
+            </div>
+
+            <div class="uber-factor-row">
+              <div class="uber-factor-meta">
+                <span>⭐ Driver Tenure Bonus</span>
+                <strong id="factor-courier" class="mono" style="color: var(--uber-green);">-3.6 min</strong>
+              </div>
+              <div class="uber-factor-track">
+                <div class="uber-factor-fill" id="factor-bar-courier" style="width: 15%; background-color: var(--uber-green);"></div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: BATCH DISPATCH MANIFESTS -->
+    <div id="tab-batch" class="tab-content">
+      <div class="uber-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div>
+            <h2 class="uber-card-title">Batch Dispatch Manifests</h2>
+            <p class="uber-card-subtitle">Upload CSV manifests to predict ETAs in bulk for fleet dispatching</p>
+          </div>
+          <button class="uber-btn-outline" onclick="downloadSampleCSV()">
+            <i class="fa-solid fa-download"></i> Download Sample CSV
+          </button>
+        </div>
+
+        <div class="uber-dropzone" id="drop-zone" onclick="document.getElementById('csv-file-input').click()">
+          <input type="file" id="csv-file-input" accept=".csv" style="display: none;" onchange="handleFileUpload(event)">
+          <div style="font-size: 2.5rem; color: var(--uber-white); margin-bottom: 0.75rem;"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.25rem;">Upload Manifest CSV</h3>
+          <p style="color: var(--uber-gray-400); font-size: 0.85rem;">Drag and drop or browse from your computer</p>
+        </div>
+
+        <!-- Batch Results -->
+        <div id="batch-results-container" style="display: none;">
+          <div class="uber-stats-grid">
+            <div class="uber-stat-card">
+              <div class="uber-stat-title">Total Orders Evaluated</div>
+              <div class="uber-stat-number mono" id="batch-stat-total">0</div>
+            </div>
+            <div class="uber-stat-card">
+              <div class="uber-stat-title">Average Predicted ETA</div>
+              <div class="uber-stat-number mono" id="batch-stat-avg">0 min</div>
+            </div>
+            <div class="uber-stat-card">
+              <div class="uber-stat-title">Low Delay Risk</div>
+              <div class="uber-stat-number mono" style="color: var(--uber-green);" id="batch-stat-low">0</div>
+            </div>
+            <div class="uber-stat-card">
+              <div class="uber-stat-title">High Delay Warnings</div>
+              <div class="uber-stat-number mono" style="color: var(--uber-red);" id="batch-stat-high">0</div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 800;">Manifest Predictions Preview</h3>
+            <button class="uber-btn-black" style="width: auto; padding: 0.5rem 1.25rem; font-size: 0.85rem; margin-top: 0;" onclick="exportBatchCSV()">
+              <i class="fa-solid fa-file-arrow-down"></i> Export Enriched CSV
+            </button>
+          </div>
+
+          <div class="uber-table-wrap">
+            <table class="uber-table">
+              <thead>
+                <tr>
+                  <th>Distance</th>
+                  <th>Weather</th>
+                  <th>Traffic</th>
+                  <th>Vehicle</th>
+                  <th>Prep Time</th>
+                  <th>Driver Exp</th>
+                  <th>Predicted ETA</th>
+                  <th>SLA Window</th>
+                  <th>Delay Risk</th>
+                </tr>
+              </thead>
+              <tbody id="batch-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 3: MODEL EVALUATION & SHAP -->
+    <div id="tab-analytics" class="tab-content">
+      
+      <!-- Metrics Cards -->
+      <div class="uber-stats-grid" style="margin-bottom: 1.5rem;">
+        <div class="uber-stat-card">
+          <div class="uber-stat-title">Mean Absolute Error (MAE)</div>
+          <div class="uber-stat-number mono">7.28 <span style="font-size: 1rem; color: var(--uber-gray-400);">min</span></div>
+          <small style="color: var(--uber-gray-500);">Average deviation</small>
+        </div>
+        <div class="uber-stat-card">
+          <div class="uber-stat-title">Test R² Score</div>
+          <div class="uber-stat-number mono" style="color: var(--uber-green);">0.778</div>
+          <small style="color: var(--uber-gray-500);">77.8% variance explained</small>
+        </div>
+        <div class="uber-stat-card">
+          <div class="uber-stat-title">5-Fold Cross Validation</div>
+          <div class="uber-stat-number mono">0.781</div>
+          <small style="color: var(--uber-gray-500);">Std Dev ±0.012</small>
+        </div>
+        <div class="uber-stat-card">
+          <div class="uber-stat-title">Inference Engine Latency</div>
+          <div class="uber-stat-number mono" style="color: var(--uber-yellow);">< 4.5 <span style="font-size: 1rem; color: var(--uber-gray-400);">ms</span></div>
+          <small style="color: var(--uber-gray-500);">Sub-5ms per prediction</small>
+        </div>
+      </div>
+
+      <!-- SHAP Visualizations -->
+      <div class="uber-shap-grid">
+        <div class="uber-plot-card">
+          <h3 style="font-size: 1rem; font-weight: 800;"><i class="fa-solid fa-water"></i> SHAP Local Waterfall Attribution</h3>
+          <p style="color: var(--uber-gray-400); font-size: 0.8rem;">Feature attribution showing additive positive and negative pushes on delivery duration.</p>
+          <img src="/api/figures/shap_waterfall.png" alt="SHAP Waterfall" loading="lazy">
+        </div>
+
+        <div class="uber-plot-card">
+          <h3 style="font-size: 1rem; font-weight: 800;"><i class="fa-solid fa-diagram-project"></i> SHAP Global Beeswarm Summary</h3>
+          <p style="color: var(--uber-gray-400); font-size: 0.8rem;">Feature distribution across the entire 1,000-order training dataset.</p>
+          <img src="/api/figures/shap_beeswarm.png" alt="SHAP Beeswarm" loading="lazy">
+        </div>
+
+        <div class="uber-plot-card">
+          <h3 style="font-size: 1rem; font-weight: 800;"><i class="fa-solid fa-chart-column"></i> Global Feature Importance</h3>
+          <p style="color: var(--uber-gray-400); font-size: 0.8rem;">Mean absolute SHAP value ranking key drivers of delivery duration.</p>
+          <img src="/api/figures/shap_bar.png" alt="SHAP Feature Importance" loading="lazy">
+        </div>
+
+        <div class="uber-plot-card">
+          <h3 style="font-size: 1rem; font-weight: 800;"><i class="fa-solid fa-scale-balanced"></i> Benchmark Model Comparison</h3>
+          <p style="color: var(--uber-gray-400); font-size: 0.8rem;">Evaluation of XGBoost vs LightGBM, Random Forest, LSTM, and Linear Regression.</p>
+          <img src="/api/figures/model_comparison.png" alt="Model Comparison" loading="lazy">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 4: ACTIVITY AUDIT LOG -->
+    <div id="tab-history" class="tab-content">
+      <div class="uber-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div>
+            <h2 class="uber-card-title">Session Dispatch Activity</h2>
+            <p class="uber-card-subtitle">Real-time audit log of predictions calculated during this session</p>
+          </div>
+          <button class="uber-btn-outline" onclick="refreshHistory()">
+            <i class="fa-solid fa-rotate"></i> Refresh Feed
+          </button>
+        </div>
+
+        <div class="uber-table-wrap">
+          <table class="uber-table">
+            <thead>
+              <tr>
+                <th>Dispatch ID</th>
+                <th>Time</th>
+                <th>Distance</th>
+                <th>Weather</th>
+                <th>Traffic</th>
+                <th>Fleet Type</th>
+                <th>Kitchen Prep</th>
+                <th>Predicted ETA</th>
+                <th>Risk Tier</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <tr>
+                <td colspan="9" style="text-align: center; color: var(--uber-gray-400); padding: 2.5rem;">No dispatches simulated in this session yet. Run a prediction on the Ride & Delivery tab!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="uber-footer">
+    <p>© 2026 ETA Predictor • Estimated Time of Arrival Prediction Engine • XGBoost Production Pipeline</p>
+  </footer>
+
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- App JS -->
+  <script src="/static/app.js"></script>
+</body>
+</html>

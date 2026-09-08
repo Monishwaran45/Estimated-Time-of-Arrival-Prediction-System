@@ -1,14 +1,14 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/",
-      "destination": "/static/index.html"
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
     },
     {
-      "source": "/static/(.*)",
-      "destination": "/static/$1"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ],
   "headers": [
