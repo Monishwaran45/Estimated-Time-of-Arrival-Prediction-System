@@ -156,6 +156,7 @@ h1, h2, h3, h4, .uber-logo, .eta-headline {
   letter-spacing: -0.8px;
   background: linear-gradient(135deg, #ffffff 30%, #a0aec0 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
