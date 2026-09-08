@@ -137,22 +137,22 @@ function initTabs() {
   });
 }
 
-// Helper for glowing pulse map markers
+// Map Markers (Pickup Circle & Dropoff Square as shown in UI reference)
 function createPickupPinIcon(emoji = "🍕") {
   return L.divIcon({
     className: "uber-map-pin",
-    html: `<div class="custom-pulse-pin"><div class="pin-halo"></div><div class="pin-body">${emoji}</div></div>`,
-    iconSize: [38, 38],
-    iconAnchor: [19, 19]
+    html: `<div style="background: #000000; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #ffffff; box-shadow: 0 4px 14px rgba(0,0,0,0.6); font-size: 15px; cursor: grab;">${emoji}</div>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17]
   });
 }
 
-function createDropoffPinIcon(emoji = "📍") {
+function createDropoffPinIcon(emoji = "🏠") {
   return L.divIcon({
     className: "uber-map-pin",
-    html: `<div class="custom-pulse-pin"><div class="pin-halo dropoff-halo"></div><div class="pin-body dropoff-body">${emoji}</div></div>`,
-    iconSize: [38, 38],
-    iconAnchor: [19, 19]
+    html: `<div style="background: #000000; width: 34px; height: 34px; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 3px solid #ffffff; box-shadow: 0 4px 14px rgba(0,0,0,0.6); font-size: 15px; cursor: grab;">${emoji}</div>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17]
   });
 }
 
@@ -169,16 +169,16 @@ function initMap() {
 
   L.control.zoom({ position: 'topright' }).addTo(map);
 
-  // Modern Dark Matter CartoDB tiles (clean, free, zero watermark)
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+  // Clean Light Street Map Tiles (Positron - Light mode as in picture, zero watermark)
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19
   }).addTo(map);
 
-  // High-visibility glowing map pins
+  // Pickup (Circle) & Dropoff (Square) Markers
   const pickupIcon = createPickupPinIcon(currentServiceMode === "ride" ? "🚕" : "🍕");
-  const dropoffIcon = createDropoffPinIcon("📍");
+  const dropoffIcon = createDropoffPinIcon("🏠");
 
   restaurantMarker = L.marker(restaurantPos, { icon: pickupIcon, draggable: true }).addTo(map);
   customerMarker = L.marker(customerPos, { icon: dropoffIcon, draggable: true }).addTo(map);
@@ -186,15 +186,13 @@ function initMap() {
   restaurantMarker.bindPopup("<b>Central Dispatch Hub</b><br>Pickup Location (Drag to change)");
   customerMarker.bindPopup("<b>Customer Dropoff</b><br>Destination (Drag to change)");
 
-  // High-visibility glowing route line
+  // Bold Black dashed route line
   routePolyline = L.polyline([restaurantPos, customerPos], {
-    color: '#00E676',
-    weight: 5,
-    opacity: 0.95,
+    color: '#000000',
+    weight: 4,
+    opacity: 0.9,
     lineCap: 'round',
-    lineJoin: 'round',
-    dashArray: '8, 8',
-    className: 'glowing-route-line'
+    dashArray: '6, 8'
   }).addTo(map);
 
   restaurantMarker.on('drag', updateRouteFromMap);

@@ -640,7 +640,7 @@ main {
 #map {
   height: 100%;
   width: 100%;
-  background-color: var(--uber-black);
+  background-color: #f4f5f7;
 }
 
 .uber-map-floating-panel {
@@ -648,17 +648,17 @@ main {
   top: 14px;
   left: 14px;
   right: 14px;
-  background: rgba(10, 13, 18, 0.82);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--uber-card-border);
+  background: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 0.75rem 1.25rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 1000;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .uber-map-bottom-bar {
@@ -666,17 +666,17 @@ main {
   bottom: 14px;
   left: 14px;
   right: 14px;
-  background: rgba(10, 13, 18, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--uber-card-border);
+  background: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 0.65rem 1.25rem;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 1000;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .uber-btn-outline {
