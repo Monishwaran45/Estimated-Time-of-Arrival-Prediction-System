@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: eta-prediction-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: MYSQL_HOST
+        value: 127.0.0.1
+      - key: MYSQL_PORT
+        value: "3306"
+      - key: MYSQL_USER
+        value: root
+      - key: MYSQL_PASSWORD
+        value: root
+      - key: MYSQL_DB
+        value: eta_db

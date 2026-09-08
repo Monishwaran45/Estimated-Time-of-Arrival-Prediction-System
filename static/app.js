@@ -1,6 +1,32 @@
 // ==========================================================================
-// Uber ETA Platform - Client Application Engine
+// ETA Predictor Platform - Client Application Engine
 // ==========================================================================
+
+// Base API URL Resolver (supports local full-stack server, relative paths, or external Render backend on Vercel)
+function getApiUrl(path) {
+  const customBase = localStorage.getItem("eta_api_base") || window.RENDER_BACKEND_URL || "";
+  return customBase ? `${customBase.replace(/\/+$/, "")}${path}` : path;
+}
+
+function configureBackendUrl() {
+  const current = localStorage.getItem("eta_api_base") || window.RENDER_BACKEND_URL || "(Same Origin / Localhost)";
+  const input = prompt(
+    "Enter your Render Backend URL (e.g., https://eta-prediction-backend.onrender.com) or leave blank for local default:",
+    current.startsWith("http") ? current : ""
+  );
+  if (input !== null) {
+    if (input.trim() === "") {
+      localStorage.removeItem("eta_api_base");
+      alert("Reset to default (Local / Same-Origin) API endpoint.");
+    } else {
+      localStorage.setItem("eta_api_base", input.trim());
+      alert(`Backend API URL configured: ${input.trim()}`);
+    }
+    checkDatabaseStatus();
+    loadPresets();
+    calculateETA();
+  }
+}
 
 let map;
 let restaurantMarker, customerMarker, routePolyline, courierAnimMarker;
@@ -36,28 +62,32 @@ async function checkDatabaseStatus() {
   const mlBadge = document.getElementById("ml-engine-badge");
 
   try {
-    const res = await fetch("/api/db/status");
+    const res = await fetch(getApiUrl("/api/db/status"));
     if (res.ok) {
       const data = await res.json();
       if (data.status === "connected") {
-        if (badgeText) badgeText.innerHTML = `DB: <strong style="color: var(--uber-green);">${data.database_type}</strong> (${data.total_predictions_stored} logged)`;
-        if (pulseDot) pulseDot.className = "pulse-dot-green";
+        if (badgeText) badgeText.innerHTML = `Backend: <strong style="color: var(--uber-green);">${data.database_type}</strong>`;
+        if (pulseDot) pulseDot.style.background = "var(--uber-green)";
       } else {
-        if (badgeText) badgeText.innerHTML = `DB: <strong style="color: var(--uber-yellow);">${data.database_type || "Offline"}</strong>`;
+        if (badgeText) badgeText.innerHTML = `Backend: <strong style="color: var(--uber-yellow);">${data.database_type || "Ready"}</strong>`;
         if (pulseDot) pulseDot.style.background = "var(--uber-yellow)";
       }
+    } else {
+      if (badgeText) badgeText.innerHTML = `Backend: <strong style="color: var(--uber-red);">Error (${res.status})</strong>`;
+      if (pulseDot) pulseDot.style.background = "var(--uber-red)";
     }
     
     // Fetch dynamic model metrics
-    const healthRes = await fetch("/api/health");
+    const healthRes = await fetch(getApiUrl("/api/health"));
     if (healthRes.ok) {
       const health = await healthRes.json();
       if (mlBadge) {
-        mlBadge.innerHTML = `ML: <strong>Active (MAE ±${health.dynamic_mae_min || '7.28'}m)</strong>`;
+        mlBadge.innerHTML = `ML: <strong>Active (MAE ±${health.dynamic_mae_min || '2.72'}m)</strong>`;
       }
     }
   } catch (err) {
-    if (badgeText) badgeText.innerHTML = `DB: <strong style="color: var(--uber-red);">Disconnected</strong>`;
+    if (badgeText) badgeText.innerHTML = `Backend: <strong style="color: var(--uber-red);">Offline / Click to config</strong>`;
+    if (pulseDot) pulseDot.style.background = "var(--uber-red)";
   }
 }
 
@@ -401,7 +431,7 @@ function renderPresetChips(presetList) {
 async function loadPresets() {
   renderPresetChips(FOOD_PRESETS);
   try {
-    const res = await fetch("/api/presets");
+    const res = await fetch(getApiUrl("/api/presets"));
     if (res.ok) {
       const presets = await res.json();
       presets.forEach(p => presetsData[p.id] = p.data);
@@ -467,7 +497,7 @@ async function calculateETA() {
   const payload = getFormData();
 
   try {
-    const res = await fetch("/api/predict", {
+    const res = await fetch(getApiUrl("/api/predict"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -597,7 +627,7 @@ async function processCSVFile(file) {
   dropZone.innerHTML = `<div style="font-size: 2rem; color: var(--uber-white); margin-bottom: 0.5rem;"><i class="fa-solid fa-spinner fa-spin"></i></div><h4 style="font-size: 1rem; font-weight: 700;">Evaluating ${file.name} with XGBoost...</h4>`;
 
   try {
-    const res = await fetch("/api/batch-predict", {
+    const res = await fetch(getApiUrl("/api/batch-predict"), {
       method: "POST",
       body: formData
     });
@@ -667,7 +697,7 @@ async function exportBatchCSV() {
   formData.append("file", lastUploadedFile);
 
   try {
-    const res = await fetch("/api/batch-export", {
+    const res = await fetch(getApiUrl("/api/batch-export"), {
       method: "POST",
       body: formData
     });
@@ -713,7 +743,7 @@ function downloadSampleCSV() {
 // ---------------------------------------------------------
 async function refreshHistory() {
   try {
-    const res = await fetch("/api/history");
+    const res = await fetch(getApiUrl("/api/history"));
     if (res.ok) {
       const data = await res.json();
       const tbody = document.getElementById("history-table-body");
