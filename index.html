@@ -222,9 +222,11 @@
           </form>
         </div>
 
-        <!-- Center: Map View -->
-        <div>
-          <div class="uber-map-container">
+        <!-- Right Column: Map on Top, Estimated Delivery Time & Telemetry Under the Map -->
+        <div class="uber-map-telemetry-col">
+          
+          <!-- Map View -->
+          <div class="uber-map-container" style="height: 430px;">
             <div id="map"></div>
             
             <!-- Top Map Floating Bar -->
@@ -247,96 +249,97 @@
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Right: ETA Telemetry HUD -->
-        <div class="uber-hud-col">
-          
-          <!-- Hero Estimated Time -->
-          <div class="uber-eta-badge-card">
-            <div class="uber-eta-label">Estimated Delivery Time</div>
-            <div class="uber-eta-number-wrap">
-              <span class="eta-headline mono" id="eta-display-num">--</span>
-              <span class="eta-headline-unit">min</span>
-            </div>
-            <div class="uber-sla-pill">
-              <i class="fa-solid fa-shield-check" style="color: var(--uber-green);"></i>
-              <span>Guaranteed SLA: <strong id="sla-range" class="mono">-- to -- min</strong></span>
-            </div>
-          </div>
-
-          <!-- Delay Risk Level -->
-          <div class="uber-risk-box">
-            <div class="uber-risk-header">
-              <span style="font-size: 0.75rem; font-weight: 700; color: var(--uber-gray-400); text-transform: uppercase;">Delay Risk Assessment</span>
-              <span class="uber-risk-tag" id="risk-badge-display" style="background: var(--uber-green-bg); color: var(--uber-green);">
-                LOW RISK
-              </span>
-            </div>
-            <div class="uber-risk-bar">
-              <div class="uber-risk-fill" id="risk-bar-fill" style="width: 25%;"></div>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--uber-gray-500); margin-top: 6px;">
-              <span>Fast (<35m)</span>
-              <span>Standard (35-60m)</span>
-              <span>Delay Warning (>60m)</span>
-            </div>
-          </div>
-
-          <!-- Bottleneck Factors Breakdown -->
-          <div class="uber-factors-card">
-            <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--uber-gray-400); margin-bottom: 0.85rem;">
-              Trip Bottleneck Breakdown
-            </div>
-
-            <div class="uber-factor-row" id="factor-row-prep">
-              <div class="uber-factor-meta">
-                <span id="factor-prep-label">🍳 Kitchen Preparation</span>
-                <strong id="factor-prep" class="mono">15.0 min</strong>
+          <!-- Under the Map: Estimated Delivery Time & Telemetry HUD Row -->
+          <div class="uber-hud-grid-under-map">
+            
+            <!-- Hero Estimated Time -->
+            <div class="uber-eta-badge-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center;">
+              <div class="uber-eta-label">Estimated Delivery Time</div>
+              <div class="uber-eta-number-wrap">
+                <span class="eta-headline mono" id="eta-display-num">--</span>
+                <span class="eta-headline-unit">min</span>
               </div>
-              <div class="uber-factor-track">
-                <div class="uber-factor-fill" id="factor-bar-prep" style="width: 35%;"></div>
+              <div class="uber-sla-pill">
+                <i class="fa-solid fa-shield-check" style="color: var(--uber-green);"></i>
+                <span>Guaranteed SLA: <strong id="sla-range" class="mono">-- to -- min</strong></span>
               </div>
             </div>
 
-            <div class="uber-factor-row">
-              <div class="uber-factor-meta">
-                <span>🛣️ Route Base Transit</span>
-                <strong id="factor-transit" class="mono">11.0 min</strong>
+            <!-- Delay Risk Level -->
+            <div class="uber-risk-box" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center;">
+              <div class="uber-risk-header">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--uber-gray-400); text-transform: uppercase;">Delay Risk Assessment</span>
+                <span class="uber-risk-tag" id="risk-badge-display" style="background: var(--uber-green-bg); color: var(--uber-green);">
+                  LOW RISK
+                </span>
               </div>
-              <div class="uber-factor-track">
-                <div class="uber-factor-fill" id="factor-bar-transit" style="width: 30%;"></div>
+              <div class="uber-risk-bar">
+                <div class="uber-risk-fill" id="risk-bar-fill" style="width: 25%;"></div>
               </div>
-            </div>
-
-            <div class="uber-factor-row">
-              <div class="uber-factor-meta">
-                <span>🚦 Traffic Delay Friction</span>
-                <strong id="factor-traffic" class="mono">+8.5 min</strong>
-              </div>
-              <div class="uber-factor-track">
-                <div class="uber-factor-fill" id="factor-bar-traffic" style="width: 25%; background-color: var(--uber-yellow);"></div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--uber-gray-500); margin-top: 6px;">
+                <span>Fast (<35m)</span>
+                <span>Standard (35-60m)</span>
+                <span>Delay (>60m)</span>
               </div>
             </div>
 
-            <div class="uber-factor-row">
-              <div class="uber-factor-meta">
-                <span>🌧️ Weather Impact</span>
-                <strong id="factor-weather" class="mono">+1.0 min</strong>
+            <!-- Bottleneck Factors Breakdown -->
+            <div class="uber-factors-card" style="margin-bottom: 0;">
+              <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--uber-gray-400); margin-bottom: 0.75rem;">
+                Trip Bottleneck Breakdown
               </div>
-              <div class="uber-factor-track">
-                <div class="uber-factor-fill" id="factor-bar-weather" style="width: 10%;"></div>
-              </div>
-            </div>
 
-            <div class="uber-factor-row">
-              <div class="uber-factor-meta">
-                <span>⭐ Driver Tenure Bonus</span>
-                <strong id="factor-courier" class="mono" style="color: var(--uber-green);">-3.6 min</strong>
+              <div class="uber-factor-row" id="factor-row-prep">
+                <div class="uber-factor-meta">
+                  <span id="factor-prep-label">🍳 Kitchen Preparation</span>
+                  <strong id="factor-prep" class="mono">15.0 min</strong>
+                </div>
+                <div class="uber-factor-track">
+                  <div class="uber-factor-fill" id="factor-bar-prep" style="width: 35%;"></div>
+                </div>
               </div>
-              <div class="uber-factor-track">
-                <div class="uber-factor-fill" id="factor-bar-courier" style="width: 15%; background-color: var(--uber-green);"></div>
+
+              <div class="uber-factor-row">
+                <div class="uber-factor-meta">
+                  <span>🛣️ Route Base Transit</span>
+                  <strong id="factor-transit" class="mono">11.0 min</strong>
+                </div>
+                <div class="uber-factor-track">
+                  <div class="uber-factor-fill" id="factor-bar-transit" style="width: 30%;"></div>
+                </div>
               </div>
+
+              <div class="uber-factor-row">
+                <div class="uber-factor-meta">
+                  <span>🚦 Traffic Delay Friction</span>
+                  <strong id="factor-traffic" class="mono">+8.5 min</strong>
+                </div>
+                <div class="uber-factor-track">
+                  <div class="uber-factor-fill" id="factor-bar-traffic" style="width: 25%; background-color: var(--uber-yellow);"></div>
+                </div>
+              </div>
+
+              <div class="uber-factor-row">
+                <div class="uber-factor-meta">
+                  <span>🌧️ Weather Impact</span>
+                  <strong id="factor-weather" class="mono">+1.0 min</strong>
+                </div>
+                <div class="uber-factor-track">
+                  <div class="uber-factor-fill" id="factor-bar-weather" style="width: 10%;"></div>
+                </div>
+              </div>
+
+              <div class="uber-factor-row">
+                <div class="uber-factor-meta">
+                  <span>⭐ Driver Tenure Bonus</span>
+                  <strong id="factor-courier" class="mono" style="color: var(--uber-green);">-3.6 min</strong>
+                </div>
+                <div class="uber-factor-track">
+                  <div class="uber-factor-fill" id="factor-bar-courier" style="width: 15%; background-color: var(--uber-green);"></div>
+                </div>
+              </div>
+
             </div>
 
           </div>

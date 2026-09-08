@@ -261,19 +261,33 @@ main {
   display: block;
 }
 
-/* Uber Ride / Delivery Grid Layout */
+/* Uber Ride / Delivery Grid Layout (Left Form, Right Map with ETA HUD underneath) */
 .uber-dispatch-layout {
   display: grid;
-  grid-template-columns: 440px 1fr 400px;
+  grid-template-columns: 440px 1fr;
   gap: 1.5rem;
   align-items: start;
 }
 
-@media (max-width: 1400px) {
-  .uber-dispatch-layout {
-    grid-template-columns: 420px 1fr;
+.uber-map-telemetry-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.uber-hud-grid-under-map {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1.3fr;
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+@media (max-width: 1250px) {
+  .uber-hud-grid-under-map {
+    grid-template-columns: 1fr 1fr;
   }
-  .uber-hud-col {
+  .uber-factors-card {
     grid-column: span 2;
   }
 }
@@ -282,7 +296,13 @@ main {
   .uber-dispatch-layout {
     grid-template-columns: 1fr;
   }
-  .uber-hud-col {
+}
+
+@media (max-width: 720px) {
+  .uber-hud-grid-under-map {
+    grid-template-columns: 1fr;
+  }
+  .uber-factors-card {
     grid-column: span 1;
   }
 }
