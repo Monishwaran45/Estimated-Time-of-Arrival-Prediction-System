@@ -3,6 +3,10 @@
 // ==========================================================================
 
 // Base API URL Resolver (supports local full-stack server, relative paths, or external Render backend on Vercel)
+window.RENDER_BACKEND_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+  ? ""
+  : "https://estimated-time-of-arrival-prediction.onrender.com";
+
 function getApiUrl(path) {
   const customBase = localStorage.getItem("eta_api_base") || window.RENDER_BACKEND_URL || "";
   return customBase ? `${customBase.replace(/\/+$/, "")}${path}` : path;
